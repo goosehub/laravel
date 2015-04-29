@@ -19,6 +19,8 @@ Route::get('users', 'UserController@index');
 
 Route::get('user/{id}', 'UserController@showProfile');
 
+Route::get('search_users', 'UserController@findProfile');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

@@ -39,6 +39,12 @@
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
+
+				<form action="{{ url('/') }}/search_users" method="get">
+					<input type="search" name="get_user" class="btn btn-default" placeholder="Search Users"/>
+					<input type="submit" class="btn btn-default"/>
+				</form>
+
 					@if (Auth::guest())
 						<li><a href="{{ url('/auth/login') }}">Login</a></li>
 						<li><a href="{{ url('/auth/register') }}">Register</a></li>

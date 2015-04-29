@@ -21,5 +21,13 @@ class UserController extends Controller {
 	{
 	    return view('profile', ['user' => User::findOrFail($id)]);
 	}
+	public function findProfile()
+	{
+	    $name = $_GET['get_user'];
+
+	    $user_search = User::where('name', '=', $name)->get();
+
+	    return View::make('user_search')->with('user_search', $user_search);
+	}
 
 }

@@ -4,7 +4,9 @@
     <h1>List of Users!</h1>
     @foreach($users as $user)
 	    <ol>
-	        <li>{{ $user->name }}</li>
+	        <li>
+		        <a href="user/{{ $user->id }}" class="lead" >{{ $user->name }}</a>
+	        </li>
         </ol>
     @endforeach
 @endsection
