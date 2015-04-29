@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use App\User;
+use App\Models\User;
 use View;
 
 class UserController extends Controller {
@@ -23,7 +23,7 @@ class UserController extends Controller {
 	 */
 	public function __construct()
 	{
-		$this->middleware('auth');
+		// $this->middleware('auth');
 	}
 
 	/**
@@ -33,7 +33,7 @@ class UserController extends Controller {
 	 */
 	public function index()
 	{		
-	    $users = User::all();
+	    $users = \App\Models\User::all();
 
 	    return View::make('users')->with('users', $users);
 
