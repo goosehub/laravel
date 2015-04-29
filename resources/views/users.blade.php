@@ -1,8 +1,10 @@
 @extends('layout')
 
 @section('content')
-    Users!
+    <h1>List of Users!</h1>
     @foreach($users as $user)
-        <p>{{ $user->name }}</p>
+	    <ol>
+	        <li>{{ $user->name }}</li>
+        </ol>
     @endforeach
-@stop
+@endsection
