@@ -23,6 +23,8 @@ Route::get('search_users', 'UserController@findProfile');
 
 Route::get('interface', 'InterfaceController@showInterface');
 
+Route::get('speak', 'InterfaceController@speak');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

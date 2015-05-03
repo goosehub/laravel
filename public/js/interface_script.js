@@ -13,15 +13,14 @@ $(document).ready( function() {
         // Clear input and refocus
         $('#text_input').val('');
         $('#text_input').focus();
-        // $.ajax({
-        //     url: 'test',
-        //     data: { text_input: text_input },
-	       //  cache: false,
-        //     success: function (data) {
-        //         showMsg(data);
-        //         $('#response_cnt').html('success');
-        //     }
-        // });
+        $.ajax({
+            url: 'speak',
+            data: { text_input: text_input },
+	        cache: false,
+            success: function (data) {
+                $('#response_cnt').append(data);
+            }
+        });
     });
 
 });

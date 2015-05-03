@@ -12,4 +12,10 @@ class InterfaceController extends Controller {
 		return view('interface');
 	}
 
+	public function speak()
+	{
+		$text_input = $_GET['text_input'];
+		return $text_input;
+	}
+
 }
