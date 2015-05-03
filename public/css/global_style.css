@@ -1,0 +1,9 @@
+body {
+	overflow-x: hidden;
+}
+.nav_search_form, .nav_search_submit {
+	display: inline;
+}
+.nav_search_submit {
+	margin-right: 5em;
+}

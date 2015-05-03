@@ -1,15 +1,15 @@
 <?php namespace App\Http\Controllers;
 
-class WelcomeController extends Controller {
+class InterfaceController extends Controller {
 
 	public function __construct()
 	{
 		// $this->middleware('guest');
 	}
 
-	public function index()
+	public function showInterface()
 	{
-		return view('welcome');
+		return view('interface');
 	}
 
 }
