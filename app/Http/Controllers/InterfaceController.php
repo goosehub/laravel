@@ -1,10 +1,13 @@
 <?php namespace App\Http\Controllers;
 
+use App\Models\Text;
+use View;
+
 class InterfaceController extends Controller {
 
 	public function __construct()
 	{
-		// $this->middleware('guest');
+		//
 	}
 
 	public function showInterface()
@@ -14,8 +17,18 @@ class InterfaceController extends Controller {
 
 	public function speak()
 	{
+		// Store data
 		$text_input = $_GET['text_input'];
-		return $text_input;
+		// Format data
+		$insert_data = array(
+		    'text' => $text_input,
+		);
+		// Insert data
+		$text = Text::insert($insert_data);
+		// Get data
+	    $response = Text::where('text', '=', $insert_data)->get();
+	    // Return data
+		return $response;
 	}
 
 }
