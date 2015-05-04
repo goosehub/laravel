@@ -1,7 +1,29 @@
 body {
 	
 }
+#text_input {
+	color: #D46A6A;
+	text-align: right;
+}
+#submit_input {
+	float: right;
+}
 #response_cnt {
-	min-height: 2em;
-	background: #e8e8e8;
+	margin-top: 2em;
+	height: 50vh;
+	background: #111;
+	padding: 2em;
+	overflow: scroll;
+}
+.user_talking, .computer_talking {
+	font-size: 2em;
+	font-family: "Roboto";
+}
+.user_talking {
+	color: #D46A6A;
+	text-align: right;
+}
+.computer_talking {
+	color: #615192;
+	text-align: left;
 }

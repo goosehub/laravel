@@ -10,6 +10,10 @@ $(document).ready( function() {
         e.preventDefault();
         // Get input
 	    text_input = $("#text_input").val();
+        // Enter input to response div
+        $('#response_cnt').append('<div class="user_talking">' + text_input + '</div>');
+        // Scroll to bottom
+        $("#response_cnt").scrollTop($("#response_cnt")[0].scrollHeight);
         // Clear input and refocus
         $('#text_input').val('');
         $('#text_input').focus();
@@ -20,7 +24,9 @@ $(document).ready( function() {
 	        cache: false,
             success: function (data) {
             	// Receive response and put to response div
-                $('#response_cnt').html(data[0]['text']);
+                $('#response_cnt').append('<div class="computer_talking">' + data[0]['text'] + '</div>');
+                // Scroll to bottom
+                $("#response_cnt").scrollTop($("#response_cnt")[0].scrollHeight);
             }
         });
     });
