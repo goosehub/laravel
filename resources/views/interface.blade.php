@@ -13,10 +13,9 @@
 				<div class="panel-heading">Interface</div>
 
 				<div class="panel-body">
-					<p>Output</p>
+					<p>Steve Thinker</p>
 					<div id="response_cnt">
 					</div>
-					Input
 					<form action method="post">
 						<input type="text" id="text_input" class="form-control" autocomplete="off" />
 						<input type="submit" id="submit_input" class="btn btn-success" />

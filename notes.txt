@@ -1,0 +1,32 @@
+=========================================================================
+
+Notes
+
+=========================================================================
+
+language assignment
+	nouns
+		""
+	verbs
+		>
+	adjectives
+		:
+	prepositions
+		+
+	conjunction
+		-
+	Determiner
+		/
+	Exclamations
+		[]
+	Adverbs
+		;
+	Pronouns
+		=
+
+Disllow
+	Pronouns
+	Adverbs
+	Most Verbs?
+	It
+	And

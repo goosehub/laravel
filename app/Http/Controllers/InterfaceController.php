@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use App\Models\Text;
+use App\Models\Conversations;
 use View;
 
 class InterfaceController extends Controller {
@@ -19,16 +19,29 @@ class InterfaceController extends Controller {
 	{
 		// Store data
 		$text_input = $_GET['text_input'];
+		$token = $_GET['_'];
+		$start = $_GET['start'];
 		// Format data
-		$insert_data = array(
-		    'text' => $text_input,
+		$insert_user_speak = array(
+		    'user' => $text_input,
+		    'start' => $start,
 		);
 		// Insert data
-		$text = Text::insert($insert_data);
-		// Get data
-	    $response = Text::where('text', '=', $insert_data)->get();
+		$insert = Conversations::insert($insert_user_speak);
+
+		// Figure out response
+		$computer_response = strtoupper($text_input);
+
+		// Format data
+		$insert_computer_speak = array(
+		    'computer' => $computer_response,
+		    'start' => $start,
+		);
+		// Insert data
+		$insert = Conversations::insert($insert_computer_speak);
+
 	    // Return data
-		return $response;
+		return $computer_response;
 	}
 
 }

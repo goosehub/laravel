@@ -3,7 +3,7 @@ body {
 }
 #text_input {
 	color: #D46A6A;
-	text-align: right;
+	text-align: left;
 }
 #submit_input {
 	float: right;
@@ -13,7 +13,7 @@ body {
 	height: 50vh;
 	background: #111;
 	padding: 2em;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 .user_talking, .computer_talking {
 	font-size: 2em;
@@ -21,9 +21,9 @@ body {
 }
 .user_talking {
 	color: #D46A6A;
-	text-align: right;
+	text-align: left;
 }
 .computer_talking {
 	color: #615192;
-	text-align: left;
+	text-align: right;
 }
