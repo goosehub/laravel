@@ -27,3 +27,6 @@ body {
 	color: #615192;
 	text-align: right;
 }
+.panel-body {
+	padding-top: 0;
+}

@@ -28,10 +28,12 @@ class InterfaceController extends Controller {
 		$start = $_GET['start'];
 
 		// 
-		// Format data
+		// Format input
 		// 
 
 		$text_input = strtolower($text_input);
+		$text_input = trim($text_input);
+		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
 		$text_input = str_replace(',', '', $text_input);
 		$text_input = str_replace('.', '', $text_input);
 		$text_input = str_replace('?', '', $text_input);
@@ -42,7 +44,9 @@ class InterfaceController extends Controller {
 		// 
 
 		$text_split = explode(' ', $text_input);
-		// var_dump($text_split);
+		// Debug
+		echo 'text_split<br/>';
+		var_dump($text_split);
 
 		// 
 		// Seperate sentence into parts of speech
@@ -51,39 +55,57 @@ class InterfaceController extends Controller {
 		// nouns
 		$pattern = '/-\w+/';
 		preg_match_all($pattern, $text_input, $nouns);
-		// var_dump($nouns);
+		// Debug
+		echo 'nouns<br/>';
+		var_dump($nouns);
 		// verbs
 		$pattern = '/>\w+/';
 		preg_match_all($pattern, $text_input, $verbs);
-		// var_dump($verbs);
+		// Debug
+		echo 'verbs<br/>';
+		var_dump($verbs);
 		// adjectives
 		$pattern = '/:\w+/';
 		preg_match_all($pattern, $text_input, $adjectives);
-		// var_dump($adjectives);
+		// Debug
+		echo 'adjectives<br/>';
+		var_dump($adjectives);
 		// conjunctions
 		$pattern = '/&\w+/';
 		preg_match_all($pattern, $text_input, $conjunctions);
-		// var_dump($conjunctions);
+		// Debug
+		echo 'conjunctions<br/>';
+		var_dump($conjunctions);
 		// determiner
 		$pattern = '/@\w+/';
 		preg_match_all($pattern, $text_input, $determiner);
-		// var_dump($determiner);
+		// Debug
+		echo 'determiner<br/>';
+		var_dump($determiner);
 		// exclamations
 		$pattern = '/#\w+/';
 		preg_match_all($pattern, $text_input, $exclamations);
-		// var_dump($exclamations);
+		// Debug
+		echo 'exclamations<br/>';
+		var_dump($exclamations);
 		// adverbs
 		$pattern = '/;\w+/';
 		preg_match_all($pattern, $text_input, $adverbs);
-		// var_dump($adverbs);
+		// Debug
+		echo 'adverbs<br/>';
+		var_dump($adverbs);
 		// pronouns
 		$pattern = '/=\w+/';
 		preg_match_all($pattern, $text_input, $pronouns);
-		// var_dump($pronouns);
+		// Debug
+		echo 'pronouns<br/>';
+		var_dump($pronouns);
 		// interjections
 		$pattern = '/\$\w+/';
 		preg_match_all($pattern, $text_input, $interjections);
-		// var_dump($interjections);
+		// Debug
+		echo 'interjections<br/>';
+		var_dump($interjections);
 
 		// 
 		// Find structure of sentence
@@ -102,9 +124,11 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $adverbs[0]) ) { $text_structure[] = 'adverb'; }
 			else if (in_array($text, $pronouns[0]) ) { $text_structure[] = 'pronoun'; }
 			else if (in_array($text, $interjections[0]) ) { $text_structure[] = 'interjection'; }
-			else { $error = 'Error: "' . $text . '" is not delimited'; }
+			else { $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
 		}
-		// var_dump($text_structure);
+		// Debug
+		echo 'text_structure<br/>';
+		var_dump($text_structure);
 
 		// 
 		// Form response
@@ -113,12 +137,10 @@ class InterfaceController extends Controller {
 		$computer_response = $original_input;
 
 		// 
-		// Error check
+		// Error stop point
 		// 
 
-		if ($error) {
-			return $error;
-		}
+		if ($error) { return $error; }
 
 		// 
 		// Enter conversation
