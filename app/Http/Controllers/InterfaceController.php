@@ -42,7 +42,7 @@ class InterfaceController extends Controller {
 		// 
 
 		$text_split = explode(' ', $text_input);
-		var_dump($text_split);
+		// var_dump($text_split);
 
 		// 
 		// Seperate sentence into parts of speech
@@ -51,39 +51,39 @@ class InterfaceController extends Controller {
 		// nouns
 		$pattern = '/-\w+/';
 		preg_match_all($pattern, $text_input, $nouns);
-		var_dump($nouns);
+		// var_dump($nouns);
 		// verbs
 		$pattern = '/>\w+/';
 		preg_match_all($pattern, $text_input, $verbs);
-		var_dump($verbs);
+		// var_dump($verbs);
 		// adjectives
 		$pattern = '/:\w+/';
 		preg_match_all($pattern, $text_input, $adjectives);
-		var_dump($adjectives);
+		// var_dump($adjectives);
 		// conjunctions
 		$pattern = '/&\w+/';
 		preg_match_all($pattern, $text_input, $conjunctions);
-		var_dump($conjunctions);
+		// var_dump($conjunctions);
 		// determiner
 		$pattern = '/@\w+/';
 		preg_match_all($pattern, $text_input, $determiner);
-		var_dump($determiner);
+		// var_dump($determiner);
 		// exclamations
 		$pattern = '/#\w+/';
 		preg_match_all($pattern, $text_input, $exclamations);
-		var_dump($exclamations);
+		// var_dump($exclamations);
 		// adverbs
 		$pattern = '/;\w+/';
 		preg_match_all($pattern, $text_input, $adverbs);
-		var_dump($adverbs);
+		// var_dump($adverbs);
 		// pronouns
 		$pattern = '/=\w+/';
 		preg_match_all($pattern, $text_input, $pronouns);
-		var_dump($pronouns);
+		// var_dump($pronouns);
 		// interjections
 		$pattern = '/\$\w+/';
 		preg_match_all($pattern, $text_input, $interjections);
-		var_dump($interjections);
+		// var_dump($interjections);
 
 		// 
 		// Find structure of sentence
@@ -102,15 +102,23 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $adverbs[0]) ) { $text_structure[] = 'adverb'; }
 			else if (in_array($text, $pronouns[0]) ) { $text_structure[] = 'pronoun'; }
 			else if (in_array($text, $interjections[0]) ) { $text_structure[] = 'interjection'; }
-			else { $error = TRUE; }
+			else { $error = 'Error: "' . $text . '" is not delimited'; }
 		}
-		var_dump($text_structure);
+		// var_dump($text_structure);
 
 		// 
 		// Form response
 		// 
 
 		$computer_response = $original_input;
+
+		// 
+		// Error check
+		// 
+
+		if ($error) {
+			return $error;
+		}
 
 		// 
 		// Enter conversation
@@ -130,7 +138,7 @@ class InterfaceController extends Controller {
 		//
 	    // Return response
 		// 
-		
+
 		return $computer_response;
 	}
 
