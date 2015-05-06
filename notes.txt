@@ -6,7 +6,7 @@ Notes
 
 language assignment
 	nouns
-		""
+		-
 	verbs
 		>
 	adjectives
@@ -14,15 +14,19 @@ language assignment
 	prepositions
 		+
 	conjunction
-		-
+		&
 	Determiner
-		/
+		@
 	Exclamations
-		[]
+		#
 	Adverbs
 		;
 	Pronouns
 		=
+	Interjections
+		$
+
+	_ is used to connect multi word words, like "William Shakespear" is william_shakespear
 
 Disllow
 	Pronouns

@@ -10,16 +10,34 @@
 	<div class="row">
 		<div class="col-md-10 col-md-offset-1">
 			<div class="panel panel-default">
-				<div class="panel-heading">Interface</div>
+				<div class="panel-heading">Steve Thinker</div>
 
 				<div class="panel-body">
-					<p>Steve Thinker</p>
 					<div id="response_cnt">
 					</div>
 					<form action method="post">
 						<input type="text" id="text_input" class="form-control" autocomplete="off" />
 						<input type="submit" id="submit_input" class="btn btn-success" />
 					</form>
+					<h2>Language Key</h2>
+					<div class="row">
+						<div class="col-md-3">
+							<p>nouns <strong> - </strong></p>
+							<p>verbs <strong> > </strong></p>
+							<p>adjectives <strong> : </strong></p>
+							<p>prepositions <strong> + </strong></p>
+						</div>
+						<div class="col-md-3">
+							<p>conjunction <strong> & </strong></p>
+							<p>Determiner <strong> @ </strong></p>
+							<p>Exclamations <strong> # </strong></p>
+						</div>
+						<div class="col-md-3">
+							<p>Adverbs <strong> ; </strong></p>
+							<p>Pronouns <strong> = </strong></p>
+							<p>Interjections <strong> $ </strong></p>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
