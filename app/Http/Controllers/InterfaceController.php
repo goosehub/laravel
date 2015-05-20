@@ -35,9 +35,12 @@ class InterfaceController extends Controller {
 		$text_input = trim($text_input);
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
 		$text_input = str_replace(',', '', $text_input);
+		$text_input = str_replace(':', '', $text_input);
 		$text_input = str_replace('.', '', $text_input);
 		$text_input = str_replace('?', '', $text_input);
 		$text_input = str_replace('!', '', $text_input);
+		$text_input = str_replace('"', '', $text_input);
+		$text_input = str_replace('\'', '', $text_input);
 
 		// 
 		// Seperate sentence into words
@@ -53,59 +56,64 @@ class InterfaceController extends Controller {
 		// 
 
 		// nouns
-		$pattern = '/-\w+/';
+		$pattern = '/=\w+/';
 		preg_match_all($pattern, $text_input, $nouns);
 		// Debug
 		echo 'nouns<br/>';
 		var_dump($nouns);
 		// verbs
-		$pattern = '/>\w+/';
+		$pattern = '/;\w+/';
 		preg_match_all($pattern, $text_input, $verbs);
 		// Debug
 		echo 'verbs<br/>';
 		var_dump($verbs);
 		// adjectives
-		$pattern = '/:\w+/';
+		$pattern = '/\*\w+/';
 		preg_match_all($pattern, $text_input, $adjectives);
 		// Debug
 		echo 'adjectives<br/>';
 		var_dump($adjectives);
-		// conjunctions
-		$pattern = '/&\w+/';
-		preg_match_all($pattern, $text_input, $conjunctions);
+		$pattern = '/`\w+/';
+		preg_match_all($pattern, $text_input, $articles);
 		// Debug
-		echo 'conjunctions<br/>';
-		var_dump($conjunctions);
-		// determiner
+		echo 'articles<br/>';
+		var_dump($articles);
+		// positive_exclamations
+		$pattern = '/\+\w+/';
+		preg_match_all($pattern, $text_input, $positive_exclamations);
+		// Debug
+		echo 'positive_exclamations<br/>';
+		var_dump($positive_exclamations);
+		// negative_exclamations
+		$pattern = '/-\w+/';
+		preg_match_all($pattern, $text_input, $negative_exclamations);
+		// Debug
+		echo 'negative_exclamations<br/>';
+		var_dump($negative_exclamations);
+		// inquiry
+		$pattern = '/~\w+/';
+		preg_match_all($pattern, $text_input, $inquiry);
+		// Debug
+		echo 'inquiry<br/>';
+		var_dump($inquiry);
+		// time
 		$pattern = '/@\w+/';
-		preg_match_all($pattern, $text_input, $determiner);
+		preg_match_all($pattern, $text_input, $time);
 		// Debug
-		echo 'determiner<br/>';
-		var_dump($determiner);
-		// exclamations
+		echo 'time<br/>';
+		var_dump($time);
+		// space
 		$pattern = '/#\w+/';
-		preg_match_all($pattern, $text_input, $exclamations);
+		preg_match_all($pattern, $text_input, $space);
 		// Debug
-		echo 'exclamations<br/>';
-		var_dump($exclamations);
-		// adverbs
-		$pattern = '/;\w+/';
-		preg_match_all($pattern, $text_input, $adverbs);
-		// Debug
-		echo 'adverbs<br/>';
-		var_dump($adverbs);
-		// pronouns
-		$pattern = '/=\w+/';
-		preg_match_all($pattern, $text_input, $pronouns);
-		// Debug
-		echo 'pronouns<br/>';
-		var_dump($pronouns);
-		// interjections
+		echo 'space<br/>';
+		var_dump($space);
+		// relation
 		$pattern = '/\$\w+/';
-		preg_match_all($pattern, $text_input, $interjections);
+		preg_match_all($pattern, $text_input, $relation);
 		// Debug
-		echo 'interjections<br/>';
-		var_dump($interjections);
+		echo 'relation<br/>';
+		var_dump($relation);
 
 		// 
 		// Find structure of sentence
@@ -115,15 +123,16 @@ class InterfaceController extends Controller {
 		foreach ($text_split as $text)
 		{
 			echo in_array($text, $nouns);
-			if (in_array($text, $nouns[0]) ) { $text_structure[] = 'noun'; }
-			else if (in_array($text, $verbs[0]) ) { $text_structure[] = 'verb'; }
-			else if (in_array($text, $adjectives[0]) ) { $text_structure[] = 'adjective'; }
-			else if (in_array($text, $conjunctions[0]) ) { $text_structure[] = 'conjunction'; }
-			else if (in_array($text, $determiner[0]) ) { $text_structure[] = 'determiner'; }
-			else if (in_array($text, $exclamations[0]) ) { $text_structure[] = 'exclamation'; }
-			else if (in_array($text, $adverbs[0]) ) { $text_structure[] = 'adverb'; }
-			else if (in_array($text, $pronouns[0]) ) { $text_structure[] = 'pronoun'; }
-			else if (in_array($text, $interjections[0]) ) { $text_structure[] = 'interjection'; }
+			if (in_array($text, $nouns[0]) ) { $text_structure[] = 'nouns'; }
+			else if (in_array($text, $verbs[0]) ) { $text_structure[] = 'verbs'; }
+			else if (in_array($text, $adjectives[0]) ) { $text_structure[] = 'adjectives'; }
+			else if (in_array($text, $articles[0]) ) { $text_structure[] = 'articles'; }
+			else if (in_array($text, $positive_exclamations[0]) ) { $text_structure[] = 'positive_exclamations'; }
+			else if (in_array($text, $negative_exclamations[0]) ) { $text_structure[] = 'negative_exclamations'; }
+			else if (in_array($text, $inquiry[0]) ) { $text_structure[] = 'inquiry'; }
+			else if (in_array($text, $time[0]) ) { $text_structure[] = 'time'; }
+			else if (in_array($text, $space[0]) ) { $text_structure[] = 'space'; }
+			else if (in_array($text, $relation[0]) ) { $text_structure[] = 'relation'; }
 			else { $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
 		}
 		// Debug

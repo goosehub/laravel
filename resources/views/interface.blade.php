@@ -20,22 +20,51 @@
 					</form>
 					<h2>Language Key</h2>
 					<div class="row">
-						<div class="col-md-3">
-							<p>join words <strong> _ </strong></p>
-							<p>nouns <strong> - </strong></p>
-							<p>verbs <strong> > </strong></p>
-							<p>adjectives <strong> : </strong></p>
+						<div class="col-md-4">
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> = </strong>Nouns </p>
+								<small>=Steve =Paris =water =people =time</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> _ </strong>Join Words </p>
+								<small>=William_Shakespear</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> ; </strong>Verbs </p>
+								<small>;do ;does ;make ;go ;is </small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> * </strong>Adjectives </p>
+								<small>*good *bad *beautiful *fourtytwo *7</small>
+							</div>
 						</div>
-						<div class="col-md-3">
-							<p>prepositions <strong> + </strong></p>
-							<p>conjunction <strong> & </strong></p>
-							<p>Determiner <strong> @ </strong></p>
-							<p>Exclamations <strong> # </strong></p>
+						<div class="col-md-4">
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> @ </strong>Prepositions of Time</p>
+								<small>@at @on</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> # </strong>Prepositions of Space</p>
+								<small>#at #on</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> $ </strong>Prepositions of Relation</p>
+								<small>$of $with $like</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> ~ </strong>Inquiry </p>
+								<small>~how ~why ~does ~will</small>
+							</div>
 						</div>
-						<div class="col-md-3">
-							<p>Adverbs <strong> ; </strong></p>
-							<p>Pronouns <strong> = </strong></p>
-							<p>Interjections <strong> $ </strong></p>
+						<div class="col-md-4">
+							<div class="explain_bubble">
+								<strong class="part_symbol"> + or - </strong><p>Exclamation </p>
+								<small>+yes -no +yay -boo</small>
+							</div>
+							<div class="explain_bubble">
+								<strong class="part_symbol"> ` </strong><p>Article </p>
+								<small>`the `a `an</small>
+							</div>
 						</div>
 					</div>
 				</div>

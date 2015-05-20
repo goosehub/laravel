@@ -9,28 +9,208 @@ language assignment
 		-
 	verbs
 		>
+		Auxiliary
+			>
+		Lexical
+			< 
 	adjectives
 		:
 	prepositions
 		+
 	conjunction
 		&
-	Determiner
+	Determiner - Articles
 		@
-	Exclamations
-		#
+	// Exclamations #
 	Adverbs
 		;
 	Pronouns
 		=
 	Interjections
 		$
+	Numbers
+		#
 
 	_ is used to connect multi word words, like "William Shakespear" is william_shakespear
+
+
+every table has these columns
+
+id
+weight
+created_at
+updated_at
+who
+
+Attr
+	key
+	type
+		event
+		state
+		thing
+		path
+		place
+		property
+		manner
+		human
+		inhuman
+		animate
+		inanimate
+		object
+		stuff
+		individual
+		collection
+		flexible
+		rigid
+		1d
+		2d
+		3d
+
+Nouns
+	slug
+
+Adjectives
+	slug
+
+Verbs
+	slug
+
+Pronoun
+	slug
+	noun_key
+
+Adverb
+	slug
+	verb_adjective_adverb_key
+	type
+
+Conjunction
+	slug
+	?
+
+Interjection
+	slug
+	context (searchable string)
+
+Article
+	slug
+
+Noun Verb Lookup
+	noun_key
+	verb_key
+	noun_key (optional)
+
+Noun Adjective Lookup
+	noun_key
+	adjective_key
+
+Noun Verb Lookup
+	noun_key
+	verb_key
+
+Interact relationships
+	noun_verb_key
+	type
+	noun_key
+	relationship
+		(Acting
+		(Going
+		(Being
+		(Having
+
+Causal Relationships
+	noun_or_verb_give_key
+	type
+	noun_or_verb_take_key
+	type
+	relationship
+		(causing
+		(letting
+		(enabling
+		(preventing
+		(impeding
+		(encouraging
+
+Spacial relationships
+	noun_or_verb_key
+	type
+	noun_key
+	preposition (under)
+
+Time relationships
+	noun_or_verb_key
+	type
+	noun_key
+	relationship (before)
+	start_time
+	happen_time
+	end_time
+	start_type (instant/indefinite)
+	end_type (instant/indefinite)
+	intervals
+
+Intent
+	noun_or_verb_cause
+	type
+	noun_or_verb_effect
+	type
+	means_bool
+	ends_bool
+	intent_bool
+
+==================================================================
 
 Disllow
 	Pronouns
 	Adverbs
+	Article?
 	Most Verbs?
 	It
 	And
+	But
+	Them
+	They
+	He
+	She
+	The
+	A
+	An
+
+Verbs
+	Make
+	Do
+	Be
+	Have
+	Take
+	Go
+		Say
+		Get
+		Know
+		Think
+			See
+			Come
+			Want
+			Use
+			Find
+			Give
+			Tell
+			Work
+			Call
+			Try
+			Ask
+			Need
+			Feel
+			Become
+			Leave
+			Put
+			Mean
+			Keep
+			Let
+			Begin
+			Seem
+			Help
+			Show
+			Hear
+			Play
+			Run
+			Move

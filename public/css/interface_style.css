@@ -30,3 +30,14 @@ body {
 .panel-body {
 	padding-top: 0;
 }
+.explain_bubble {
+	background: #44aaaa;
+	color: #000;
+	border-radius: 0.5em;
+	padding: 0.8em;
+	margin: 0.2em;
+	word-spacing: 0.4em;
+}
+.part_symbol {
+	font-size: 1.6em;
+}
