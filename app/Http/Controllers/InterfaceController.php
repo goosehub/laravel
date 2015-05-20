@@ -2,6 +2,7 @@
 
 use App\Models\Conversations;
 use View;
+use DB;
 
 class InterfaceController extends Controller {
 
@@ -23,7 +24,6 @@ class InterfaceController extends Controller {
 
 		$error = false;
 		$text_input = $original_input = $_GET['text_input'];
-		// $text_input = '-nouns >verbs :adjectives &conjunctions @determiners #exclamations ;adverbs =pronouns $interjections';
 		$token = $_GET['_'];
 		$start = $_GET['start'];
 
@@ -31,7 +31,6 @@ class InterfaceController extends Controller {
 		// Format input
 		// 
 
-		$text_input = strtolower($text_input);
 		$text_input = trim($text_input);
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
 		$text_input = str_replace(',', '', $text_input);
@@ -47,9 +46,6 @@ class InterfaceController extends Controller {
 		// 
 
 		$text_split = explode(' ', $text_input);
-		// Debug
-		echo 'text_split<br/>';
-		var_dump($text_split);
 
 		// 
 		// Seperate sentence into parts of speech
@@ -58,83 +54,108 @@ class InterfaceController extends Controller {
 		// nouns
 		$pattern = '/=\w+/';
 		preg_match_all($pattern, $text_input, $nouns);
-		// Debug
-		echo 'nouns<br/>';
-		var_dump($nouns);
 		// verbs
 		$pattern = '/;\w+/';
 		preg_match_all($pattern, $text_input, $verbs);
-		// Debug
-		echo 'verbs<br/>';
-		var_dump($verbs);
 		// adjectives
 		$pattern = '/\*\w+/';
 		preg_match_all($pattern, $text_input, $adjectives);
-		// Debug
-		echo 'adjectives<br/>';
-		var_dump($adjectives);
 		$pattern = '/`\w+/';
 		preg_match_all($pattern, $text_input, $articles);
-		// Debug
-		echo 'articles<br/>';
-		var_dump($articles);
 		// positive_exclamations
 		$pattern = '/\+\w+/';
 		preg_match_all($pattern, $text_input, $positive_exclamations);
-		// Debug
-		echo 'positive_exclamations<br/>';
-		var_dump($positive_exclamations);
 		// negative_exclamations
 		$pattern = '/-\w+/';
 		preg_match_all($pattern, $text_input, $negative_exclamations);
-		// Debug
-		echo 'negative_exclamations<br/>';
-		var_dump($negative_exclamations);
 		// inquiry
 		$pattern = '/~\w+/';
 		preg_match_all($pattern, $text_input, $inquiry);
-		// Debug
-		echo 'inquiry<br/>';
-		var_dump($inquiry);
 		// time
 		$pattern = '/@\w+/';
 		preg_match_all($pattern, $text_input, $time);
-		// Debug
-		echo 'time<br/>';
-		var_dump($time);
 		// space
 		$pattern = '/#\w+/';
 		preg_match_all($pattern, $text_input, $space);
-		// Debug
-		echo 'space<br/>';
-		var_dump($space);
 		// relation
 		$pattern = '/\$\w+/';
 		preg_match_all($pattern, $text_input, $relation);
-		// Debug
-		echo 'relation<br/>';
-		var_dump($relation);
 
 		// 
-		// Find structure of sentence
 		// 
+		// Iterate through each word of the sentence
 
 		$text_structure = [];
+		$text_data = [];
 		foreach ($text_split as $text)
 		{
+
+			// 
+			// Find structure of sentence
+			// 
+
 			echo in_array($text, $nouns);
-			if (in_array($text, $nouns[0]) ) { $text_structure[] = 'nouns'; }
-			else if (in_array($text, $verbs[0]) ) { $text_structure[] = 'verbs'; }
-			else if (in_array($text, $adjectives[0]) ) { $text_structure[] = 'adjectives'; }
-			else if (in_array($text, $articles[0]) ) { $text_structure[] = 'articles'; }
-			else if (in_array($text, $positive_exclamations[0]) ) { $text_structure[] = 'positive_exclamations'; }
-			else if (in_array($text, $negative_exclamations[0]) ) { $text_structure[] = 'negative_exclamations'; }
-			else if (in_array($text, $inquiry[0]) ) { $text_structure[] = 'inquiry'; }
-			else if (in_array($text, $time[0]) ) { $text_structure[] = 'time'; }
-			else if (in_array($text, $space[0]) ) { $text_structure[] = 'space'; }
-			else if (in_array($text, $relation[0]) ) { $text_structure[] = 'relation'; }
-			else { $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
+			if (in_array($text, $nouns[0]) ) { 
+				$text_structure[] = $display_word_part = 'noun';
+				$table = 'nouns'; 
+			}
+			else if (in_array($text, $verbs[0]) ) { 
+				$text_structure[] = $display_word_part = 'verb';
+				$table = 'verbs'; 
+			}
+			else if (in_array($text, $adjectives[0]) ) { 
+				$text_structure[] = $display_word_part = 'adjective';
+				$table = 'adjectives'; 
+			}
+			else if (in_array($text, $articles[0]) ) { 
+				$text_structure[] = $display_word_part = 'article';
+				$table = 'articles'; 
+			}
+			else if (in_array($text, $positive_exclamations[0]) ) { 
+				$text_structure[] = $display_word_part = 'positive_exclamation';
+				$table = 'positive_exclamations'; 
+			}
+			else if (in_array($text, $negative_exclamations[0]) ) { 
+				$text_structure[] = $display_word_part = 'negative_exclamation';
+				$table = 'negative_exclamations'; 
+			}
+			else if (in_array($text, $inquiry[0]) ) { 
+				$text_structure[] = $display_word_part = 'inquiry';
+				$table = 'inquiry'; 
+			}
+			else if (in_array($text, $time[0]) ) { 
+				$text_structure[] = $display_word_part = 'time';
+				$table = 'time'; 
+			}
+			else if (in_array($text, $space[0]) ) { 
+				$text_structure[] = $display_word_part = 'space';
+				$table = 'space'; 
+			}
+			else if (in_array($text, $relation[0]) ) { 
+				$text_structure[] = $display_word_part = 'relate';
+				$table = 'relate'; 
+			}
+			else { 
+				$error = 'Does Not Computer: "' . $text . '" is not delimited';
+			}
+
+			// 
+			// Get word from DB, Insert if not found, increase weight if found
+			// 
+
+			$current_found = $text_data[] = DB::select('select * from ' . $table . ' where word = :word', ['word' => $text]);
+			if (empty($current_found) )
+			{
+				DB::insert('insert into ' . $table . ' (word, weight) values (:word, :weight)', ['word' => $text, 'weight' => 1]);
+				$test = DB::statement('SET @firstid := LAST_INSERT_ID()');
+				$insert_id = DB::select('select id from ' . $table . ' where id = @firstid');
+			}
+			else
+			{
+				DB::update('update ' . $table . ' set weight = weight + 1 where id = ?', [$current_found[0]->id]);
+			}
 		}
+
 		// Debug
 		echo 'text_structure<br/>';
 		var_dump($text_structure);
