@@ -22,20 +22,42 @@
 					<div class="row">
 						<div class="col-md-4">
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> = </strong>Nouns </p>
-								<small>=Steve =Paris =water =people =time</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> _ </strong>Join Words </p>
-								<small>=William_Shakespear</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ; </strong>Verbs </p>
-								<small>;do ;does ;make ;go ;is </small>
+								<p><strong class="part_symbol"> . </strong>Nouns </p>
+								<small>.Steve .Paris .water .people .time</small>
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> * </strong>Adjectives </p>
-								<small>*good *bad *beautiful *fourtytwo *7</small>
+								<small>*beautiful *funny *evil *fourtytwo *7</small>
+							</div>
+							<div class="explain_bubble">
+								<strong class="part_symbol"> ` </strong><p>Articles </p>
+								<small>`the `a `an</small>
+							</div>
+							<div class="explain_bubble">
+								<strong class="part_symbol"> + </strong>or<strong> - </strong><p>Cheers and Jeers </p>
+								<small>+yay -boo +maybe -maybe +probably</small>
+							</div>
+							<div class="explain_bubble">
+								<strong class="part_symbol"> ++ </strong>or<strong> -- </strong><p>Positive and Negative </p>
+								<small>++yes --no</small>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> ! </strong>Do Verbs </p>
+								<small>!do !does !did !act </small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> = </strong>Is Verbs </p>
+								<small>=is =was =be =are </small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> > </strong>Go Verbs </p>
+								<small> >go >come >went >bring </small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> ; </strong>Make Verbs </p>
+								<small> ;make ;create ;cause ;bring </small>
 							</div>
 						</div>
 						<div class="col-md-4">
@@ -52,22 +74,12 @@
 								<small>$of $with $like</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ~ </strong>Inquiry </p>
-								<small>~how ~why ~does ~will</small>
-							</div>
-						</div>
-						<div class="col-md-4">
-							<div class="explain_bubble">
-								<strong class="part_symbol"> + or - </strong><p>Cheers and Jeers </p>
-								<small>+yay -boo +maybe -maybe +probably -unlikely</small>
+								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
+								<small>?how ?why ?does ?will</small>
 							</div>
 							<div class="explain_bubble">
-								<strong class="part_symbol"> ++ or -- </strong><p>Positive and Negative </p>
-								<small>++yes --no</small>
-							</div>
-							<div class="explain_bubble">
-								<strong class="part_symbol"> ` </strong><p>Articles </p>
-								<small>`the `a `an</small>
+								<p>Pronouns are not allowed </p>
+								<small>this that him she</small>
 							</div>
 						</div>
 					</div>
