@@ -71,15 +71,19 @@
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> $ </strong>Prepositions of Relation</p>
-								<small>$of $with $like</small>
+								<small>$of $with $like $who</small>
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
-								<small>?how ?why ?does ?will</small>
+								<small>?why ?does ?will ?who</small>
 							</div>
 							<div class="explain_bubble">
 								<p>Pronouns are not allowed </p>
 								<small>this that him she</small>
+							</div>
+							<div class="explain_bubble">
+								<p>Conjunctions are not allowed </p>
+								<small>and but then</small>
 							</div>
 						</div>
 					</div>
