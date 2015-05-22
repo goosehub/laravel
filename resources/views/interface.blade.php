@@ -16,7 +16,7 @@
 					</div>
 					<form action method="post">
 						<input type="text" id="text_input" class="form-control" autocomplete="off" />
-						<input type="submit" id="submit_input" class="btn btn-success" />
+						<input type="submit" id="submit_input" class="btn btn-success btn-lg" value="Speak" />
 					</form>
 					<h2>Language Key</h2>
 					<div class="row">
@@ -58,11 +58,15 @@
 						</div>
 						<div class="col-md-4">
 							<div class="explain_bubble">
-								<strong class="part_symbol"> + or - </strong><p>Exclamation </p>
-								<small>+yes -no +yay -boo</small>
+								<strong class="part_symbol"> + or - </strong><p>Cheers and Jeers </p>
+								<small>+yay -boo +maybe -maybe +probably -unlikely</small>
 							</div>
 							<div class="explain_bubble">
-								<strong class="part_symbol"> ` </strong><p>Article </p>
+								<strong class="part_symbol"> ++ or -- </strong><p>Positive and Negative </p>
+								<small>++yes --no</small>
+							</div>
+							<div class="explain_bubble">
+								<strong class="part_symbol"> ` </strong><p>Articles </p>
 								<small>`the `a `an</small>
 							</div>
 						</div>
