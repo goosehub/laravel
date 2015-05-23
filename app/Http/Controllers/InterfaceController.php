@@ -142,24 +142,23 @@ class InterfaceController extends Controller {
 		// Insert Relations
 		// 
 
-		// $lookup = false;
-		// $lookup = DB::select('select * from `lookup` where a_key = :a_key and b_key = :b_key', ['a_key' => $foo, 'b_key' => $foo]);
+		// $relationship = false;
+		// $relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $foo, 'b_key' => $foo]);
 		// if (empty($current_found) )
 		// {
-		// 	DB::insert('insert into `lookup` (a_key, a_type, b_key, b_type, true, false) values (:a_key, :a_type, :b_key, :b_type)', 
-		// 		['a_key' => $foo, 'a_type' => $foo, 'b_key' => $foo, 'b_type' => $foo]);
-		// 	// $lookup_key = DB::getPdo()->lastInsertId();
-		// 	$lookup = DB::select('select * from `lookup` where a_key = :a_key and b_key = :b_key', ['a_key' => $foo, 'b_key' => $foo]);
+		// 	DB::insert('insert into `relationships` (a_key, b_key, truth) values (:a_key, :b_key, :truth)', 
+		// 		['a_key' => $foo, 'b_key' => $foo, 'truth' => $truth]);
+		// 	$relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $foo, 'b_key' => $foo]);
 		// }
 		// else
 		// {
 		// 	if ($truth) 
 		// 	{
-		// 		DB::update('update `lookup` set positive = positive + 1 where id = :id', ['id' => $lookup[0]->id, 'part' => $part]);
+		// 		DB::update('update `relationships` set true = true + 1 where id = :id', ['id' => $relationship[0]->id, 'part' => $part]);
 		// 	}
 		// 	else
 		// 	{
-		// 		DB::update('update `lookup` set negative = negative + 1 where id = :id', ['id' => $lookup[0]->id, 'part' => $part]);
+		// 		DB::update('update `relationships` set false = false + 1 where id = :id', ['id' => $relationship[0]->id, 'part' => $part]);
 		// 	}
 		// }
 
