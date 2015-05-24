@@ -208,21 +208,37 @@ class InterfaceController extends Controller {
 			}
 		}
 
-		// 
-		// Debug
-		// 
-
-		// var_dump($text_data);
-		echo '<span class="middle_text">You said: ';
-		foreach ($text_structure as $part) { echo $part . ' '; }
-		echo '</span><br/>';
-
 
 		// 
 		// Computer response
 		// 
 
-		$computer_response = $original_input;
+		$a_key = $text_data[0][0]->id;
+		$b_key = $text_data[0][0]->id;
+
+		$response_query = DB::select("
+			select word, part
+			from `words` 
+			left join 
+			`relationships` 
+				on relationships.a_key = :a_key
+			    or relationships.b_key = :b_key
+			    where words.part = 'noun'
+			order by relationships.is_true
+			limit 1", 
+			['a_key' => $a_key, 'b_key' => $b_key]);
+
+		$computer_response = $response_query[0]->word;
+
+		// 
+		// Debug
+		// 
+
+		// var_dump($response_query);
+		// var_dump($text_data);
+		echo '<span class="middle_text">You said: ';
+		foreach ($text_structure as $part) { echo $part . ' '; }
+		echo '</span><br/>';
 
 		// 
 		// Error stop point
