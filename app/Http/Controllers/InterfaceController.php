@@ -34,13 +34,6 @@ class InterfaceController extends Controller {
 
 		$text_input = trim($text_input);
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
-		$text_input = str_replace(',', '', $text_input);
-		$text_input = str_replace(':', '', $text_input);
-		$text_input = str_replace('"', '', $text_input);
-		$text_input = str_replace('\'', '', $text_input);
-
-		// Split into words
-		$text_split = explode(' ', $text_input);
 
 		// 
 		// Seperate sentence into parts of speech
@@ -52,7 +45,7 @@ class InterfaceController extends Controller {
 		preg_match_all($pattern, $text_input, $do);
 		$pattern = '/=\w+/';
 		preg_match_all($pattern, $text_input, $is);
-		$pattern = '/>\w+/';
+		$pattern = '/:\w+/';
 		preg_match_all($pattern, $text_input, $go);
 		$pattern = '/;\w+/';
 		preg_match_all($pattern, $text_input, $make);
@@ -81,8 +74,11 @@ class InterfaceController extends Controller {
 		// Iterate through each word of the sentence
 		// 
 
+		// Split into words
+		$words = explode(' ', $text_input);
+
 		$text_structure = [];
-		foreach ($text_split as $text)
+		foreach ($words as $text)
 		{
 
 			// 
@@ -113,7 +109,6 @@ class InterfaceController extends Controller {
 
 			$current_found = $text_data[] = DB::select('select * from `words` where word = :word and part = :part', ['word' => $text, 'part' => $part]);
 
-
 			if (empty($current_found) )
 			{
 				array_pop($text_data);
@@ -124,49 +119,112 @@ class InterfaceController extends Controller {
 			{
 				DB::update('update `words` set weight = weight + 1 where id = :id', ['id' => $current_found[0]->id]);
 			}
+
+			// 
+			// Find properties of word based on user suffixes
+			// 
+
+			// psuedo
+			// if ($text contains symbol) { $text has X property }
+
 		}
 
 		// 
-		// Understand sentence
+		// Gather information and prep sentence
 		// 
 
-		// Calculate if positive or negative connontation
-		// Currently does not account for double negatives
-		$truth = count(array_keys($text_structure, 'negative')) > 0 ? false : TRUE;
-
-		// Remove articles
+		// Remove articles (for alpha only)
 		$found_articles = array_keys($text_structure, 'article');
 		foreach ($found_articles as $found_article) { unset($text_structure[$found_article]); }
 
+		// Determine if positive or negative connontation
+		// Currently does not account for double negatives
+		$is_true = count(array_keys($text_structure, 'negative')) > 0 ? false : TRUE;
+		$not_true = $is_true ? false : TRUE;
+
+		// Find number of words in sentece
+		$number_of_words = count($text_structure);
+
 		// 
-		// Insert Relations
+		// Iterate through words for relationships
 		// 
 
-		// $relationship = false;
-		// $relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $foo, 'b_key' => $foo]);
-		// if (empty($current_found) )
-		// {
-		// 	DB::insert('insert into `relationships` (a_key, b_key, truth) values (:a_key, :b_key, :truth)', 
-		// 		['a_key' => $foo, 'b_key' => $foo, 'truth' => $truth]);
-		// 	$relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $foo, 'b_key' => $foo]);
-		// }
-		// else
-		// {
-		// 	if ($truth) 
-		// 	{
-		// 		DB::update('update `relationships` set true = true + 1 where id = :id', ['id' => $relationship[0]->id, 'part' => $part]);
-		// 	}
-		// 	else
-		// 	{
-		// 		DB::update('update `relationships` set false = false + 1 where id = :id', ['id' => $relationship[0]->id, 'part' => $part]);
-		// 	}
-		// }
+		$context_array = '';
+		for($outer_relationship_i=0; $outer_relationship_i<$number_of_words; $outer_relationship_i++) 
+		{
+			for($inner_relationship_i=0; $inner_relationship_i<$number_of_words; $inner_relationship_i++) 
+			{
+				if ($inner_relationship_i > $outer_relationship_i) 
+				{
+					// 
+					// Find/Insert Relationships
+					// 
+
+					// Get pair being compared
+					$a_key = $text_data[$outer_relationship_i][0]->id;
+					$b_key = $text_data[$inner_relationship_i][0]->id;
+					// Find existing relationship
+					$relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $a_key, 'b_key' => $b_key]);
+					// Create relationship if not found
+					if (empty($relationship) )
+					{
+						DB::insert('insert into `relationships` (a_key, b_key, is_true, not_true) values (:a_key, :b_key, :is_true, :not_true)', 
+							['a_key' => $a_key, 'b_key' => $b_key, 'is_true' => $is_true, 'not_true' => $not_true]);
+						$relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $a_key, 'b_key' => $b_key]);
+					}
+					// Update truthiness
+					else
+					{
+						if ($is_true) { DB::update('update `relationships` set is_true = is_true + 1 where id = :id', ['id' => $relationship[0]->id]); }
+						else { DB::update('update `relationships` set not_true = not_true + 1 where id = :id', ['id' => $relationship[0]->id]); }
+					}
+					// Context
+					$context_array[] = $relationship[0]->id;
+				}
+			}
+		}
+
+		// 
+		// Iterate through relationships for context
+		// 
+		
+		$number_of_context = count($context_array);
+		for($outer_context_i=0; $outer_context_i<$number_of_context; $outer_context_i++) 
+		{
+			for($inner_context_i=0; $inner_context_i<$number_of_context; $inner_context_i++) 
+			{
+				if ($inner_context_i > $outer_context_i) 
+				{
+					// 
+					// Find/Insert Contexts
+					// 
+
+					// Get pair being compared
+					$x_key = $context_array[$outer_context_i];
+					$y_key = $context_array[$inner_context_i];
+					// Find existing context
+					$context = DB::select('select * from `contexts` where x_key = :x_key and y_key = :y_key', ['x_key' => $x_key, 'y_key' => $y_key]);
+					// Create context if not found
+					if (empty($context) )
+					{
+						DB::insert('insert into `contexts` (x_key, y_key, weight) values (:x_key, :y_key, :weight)', 
+							['x_key' => $x_key, 'y_key' => $y_key, 'weight' => 1]);
+						$context = DB::select('select * from `contexts` where x_key = :x_key and y_key = :y_key', ['x_key' => $x_key, 'y_key' => $y_key]);
+					}
+					// Update weight
+					else
+					{
+						DB::update('update `contexts` set weight = weight + 1 where id = :id', ['id' => $context[0]->id]);
+					}
+				}
+			}
+		}
 
 		// 
 		// Debug
 		// 
 
-		var_dump($text_data);
+		// var_dump($text_data);
 		echo '<span class="middle_text">You said: ';
 		foreach ($text_structure as $part) { echo $part . ' '; }
 		echo '</span><br/>';
@@ -204,6 +262,10 @@ class InterfaceController extends Controller {
 		// 
 
 		return $computer_response;
+
+		// 
+		// Good job
+		// 
 	}
 
 }
