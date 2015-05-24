@@ -39,36 +39,21 @@ class InterfaceController extends Controller {
 		// Seperate sentence into parts of speech
 		// 
 
-		$pattern = '/\.\w+/';
-		preg_match_all($pattern, $text_input, $noun);
-		$pattern = '/!\w+/';
-		preg_match_all($pattern, $text_input, $do);
-		$pattern = '/=\w+/';
-		preg_match_all($pattern, $text_input, $is);
-		$pattern = '/:\w+/';
-		preg_match_all($pattern, $text_input, $go);
-		$pattern = '/;\w+/';
-		preg_match_all($pattern, $text_input, $make);
-		$pattern = '/\*\w+/';
-		preg_match_all($pattern, $text_input, $adjective);
-		$pattern = '/\`\w+/';
-		preg_match_all($pattern, $text_input, $article);
-		$pattern = '/\+\w+/';
-		preg_match_all($pattern, $text_input, $cheer);
-		$pattern = '/-\w+/';
-		preg_match_all($pattern, $text_input, $jeer);
-		$pattern = '/\+\+\w+/';
-		preg_match_all($pattern, $text_input, $positive);
-		$pattern = '/--\w+/';
-		preg_match_all($pattern, $text_input, $negative);
-		$pattern = '/\?\w+/';
-		preg_match_all($pattern, $text_input, $inquiry);
-		$pattern = '/@\w+/';
-		preg_match_all($pattern, $text_input, $time);
-		$pattern = '/#\w+/';
-		preg_match_all($pattern, $text_input, $space);
-		$pattern = '/\$\w+/';
-		preg_match_all($pattern, $text_input, $relation);
+		preg_match_all('/\.[\S]+/', $text_input, $noun);
+		preg_match_all('/![\S]+/', $text_input, $do);
+		preg_match_all('/=[\S]+/', $text_input, $is);
+		preg_match_all('/:[\S]+/', $text_input, $go);
+		preg_match_all('/;[\S]+/', $text_input, $make);
+		preg_match_all('/\*[\S]+/', $text_input, $adjective);
+		preg_match_all('/\`[\S]+/', $text_input, $article);
+		preg_match_all('/\+[\S]+/', $text_input, $cheer);
+		preg_match_all('/-[\S]+/', $text_input, $jeer);
+		preg_match_all('/\+\+[\S]+/', $text_input, $positive);
+		preg_match_all('/--[\S]+/', $text_input, $negative);
+		preg_match_all('/\?[\S]+/', $text_input, $inquiry);
+		preg_match_all('/@[\S]+/', $text_input, $time);
+		preg_match_all('/#[\S]+/', $text_input, $space);
+		preg_match_all('/\$[\S]+/', $text_input, $relation);
 
 		// 
 		// Iterate through each word of the sentence
@@ -80,7 +65,6 @@ class InterfaceController extends Controller {
 		$text_structure = [];
 		foreach ($words as $text)
 		{
-
 			// 
 			// Find structure of sentence
 			// 
@@ -124,8 +108,12 @@ class InterfaceController extends Controller {
 			// Find properties of word based on user suffixes
 			// 
 
-			// psuedo
-			// if ($text contains symbol) { $text has X property }
+			$plural = strpos($text, '\s');
+			$possessive = strpos($text, '/s');
+			$past = strpos($text, '<');
+			$present = strpos($text, '^');
+			$future = strpos($text, '>');
+			$interval = strpos($text, '%');
 
 		}
 
@@ -187,7 +175,7 @@ class InterfaceController extends Controller {
 		// 
 		// Iterate through relationships for context
 		// 
-		
+
 		$number_of_context = count($context_array);
 		for($outer_context_i=0; $outer_context_i<$number_of_context; $outer_context_i++) 
 		{

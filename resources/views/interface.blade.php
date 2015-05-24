@@ -104,19 +104,19 @@
 								<small>car\s monkey\s</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> < </strong>Past Tense or Event</p>
+								<p><strong class="part_symbol"> < </strong>Past Tense</p>
 								<small>!did< .WW2< </small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ^ </strong>Present Tense or Event</p>
+								<p><strong class="part_symbol"> ^ </strong>Present Tense</p>
 								<small>=am^ . </small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> > </strong>Future Tense or Event</p>
+								<p><strong class="part_symbol"> > </strong>Future Tense</p>
 								<small>!will> </small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> % </strong>Interval Event</p>
+								<p><strong class="part_symbol"> % </strong>Interval</p>
 								<small>.Super_Bowl% !frequently</small>
 							</div>
 						</div>
