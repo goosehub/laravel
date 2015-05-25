@@ -91,7 +91,10 @@ class InterfaceController extends Controller {
 			// Get word from DB, Insert if not found, increase weight if found
 			// 
 
-			$current_found = $text_data[] = DB::select('select * from `words` where word = :word and part = :part', ['word' => $text, 'part' => $part]);
+			if ($part != 'article')
+			{
+				$current_found = $text_data[] = DB::select('select * from `words` where word = :word and part = :part', ['word' => $text, 'part' => $part]);
+			}
 
 			if (empty($current_found) )
 			{
@@ -213,20 +216,25 @@ class InterfaceController extends Controller {
 		// Computer response
 		// 
 
-		$a_key = $text_data[0][0]->id;
-		$b_key = $text_data[0][0]->id;
+		// Build array of word keys
+		$in_query_string = '(';
+		foreach ($text_data as $text_data_iteration) 
+		{
+			$word_id_array[] = $text_data_iteration[0]->id;
+			$in_query_string .= $text_data_iteration[0]->id . ',';
+		}
+		$in_query_string = rtrim($in_query_string, ',');
+		$in_query_string .= ')';
 
 		$response_query = DB::select("
 			select word, part
 			from `words` 
 			left join 
 			`relationships` 
-				on relationships.a_key = :a_key
-			    or relationships.b_key = :b_key
+				on relationships.a_key in " . $in_query_string . "
 			    where words.part = 'noun'
 			order by relationships.is_true
-			limit 1", 
-			['a_key' => $a_key, 'b_key' => $b_key]);
+			limit 1");
 
 		$computer_response = $response_query[0]->word;
 
@@ -234,6 +242,14 @@ class InterfaceController extends Controller {
 		// Debug
 		// 
 
+		// echo "select word, part
+		// 	from `words` 
+		// 	left join 
+		// 	`relationships` 
+		// 		on relationships.a_key in " . $in_query_string . "
+		// 	    where words.part = 'noun'
+		// 	order by relationships.is_true
+		// 	limit 1";
 		// var_dump($response_query);
 		// var_dump($text_data);
 		echo '<span class="middle_text">You said: ';
