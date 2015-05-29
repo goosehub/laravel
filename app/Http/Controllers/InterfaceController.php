@@ -216,7 +216,10 @@ class InterfaceController extends Controller {
 		// Computer response
 		// 
 
-		// Build array of word keys
+		// 
+		// Prep for query input
+		// 
+
 		$in_query_string = '(';
 		foreach ($text_data as $text_data_iteration) 
 		{
@@ -226,35 +229,133 @@ class InterfaceController extends Controller {
 		$in_query_string = rtrim($in_query_string, ',');
 		$in_query_string .= ')';
 
-		$response_query = DB::select("
-			select word, part
-			from `words` 
-			left join 
-			`relationships` 
-				on relationships.a_key in " . $in_query_string . "
-			    where words.part = 'noun'
-			order by relationships.is_true
-			limit 1");
+		// 
+		// Do master computer response select query
+		// 
 
-		$computer_response = $response_query[0]->word;
+		$response_query = DB::select("SELECT * FROM
+			(SELECT
+			  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1, r_1.id as r_id_1, c.y_key as c_y_1,
+			  w_2.word as word_2, w_2.part as part_2, w_2.weight as weight_2
+			FROM
+			    contexts c
+			    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
+			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+			WHERE
+			    w_1.id in " . $in_query_string . "
+            OR
+            	w_2.id in " . $in_query_string . "
+            GROUP BY
+             	w_1.word
+			ORDER BY
+ 				r_1.is_true
+ 			DESC
+            	) first
+
+			UNION
+
+			SELECT * FROM
+			(SELECT
+			  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3,r_1.a_key as a_key_3, r_1.b_key as b_key_3,  r_1.id as r_id_3,  c.y_key as c_y_2,
+			  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4
+			FROM
+			    contexts c
+			    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
+			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+			WHERE
+			    w_1.id in " . $in_query_string . "
+            OR
+            	w_2.id in " . $in_query_string . "
+            GROUP BY
+             	w_2.word
+			ORDER BY
+ 				r_1.is_true
+ 			DESC
+        	) second
+		;");
+
+		// 
+		// Formulate computer response
+		//
+
+		$computer_response = '';
+		// Halt if no response
+		if (!isset($response_query[0]->word_1) ) {
+		}
+		else
+		{
+			// $subject = isset($noun[0][0]) ? $noun[0][0] : $text_data[0][0]->word;
+			// $computer_response = $subject . ' ' . $response_query[0]->word_1 . ' ' . $response_query[0]->word_2;
+			$response_count = count($response_query);
+			for ($response_i=0;$response_i<$response_count;$response_i++)
+			{
+				if ($response_query[$response_i]->weight_1 > 3)
+				{
+					$computer_response .= $response_query[$response_i]->word_1 . ' ';
+				}
+				else
+				{
+					$response_i = 99999999;
+				}
+			}
+		}
+		// If nothing is returned, stay silent
+		if ($computer_response === '') { $computer_response = '...'; }
 
 		// 
 		// Debug
 		// 
 
-		// echo "select word, part
-		// 	from `words` 
-		// 	left join 
-		// 	`relationships` 
-		// 		on relationships.a_key in " . $in_query_string . "
-		// 	    where words.part = 'noun'
-		// 	order by relationships.is_true
-		// 	limit 1";
+		// echo "SELECT * FROM
+		// (SELECT
+		// 	  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1, r_1.id as r_id_1, c.y_key as c_y_1,
+		// 	  w_2.word as word_2, w_2.part as part_2, w_2.weight as weight_2
+		// 	FROM
+		// 	    contexts c
+		// 	    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
+		// 	    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+		// 	    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+		// 	WHERE
+		// 	    w_1.id in " . $in_query_string . "
+  //           OR
+  //           	w_2.id in " . $in_query_string . "
+  //           GROUP BY
+  //            	w_1.word
+		// 	ORDER BY
+ 	// 			r_1.is_true
+ 	// 		DESC
+  //           	) first
+
+		// 	UNION
+
+		// 	SELECT * FROM
+		// 	(SELECT
+		// 	  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3,r_1.a_key as a_key_3, r_1.b_key as b_key_3,  r_1.id as r_id_3,  c.y_key as c_y_2,
+		// 	  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4
+		// 	FROM
+		// 	    contexts c
+		// 	    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
+		// 	    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+		// 	    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+		// 	WHERE
+		// 	    w_1.id in " . $in_query_string . "
+  //           OR
+  //           	w_2.id in " . $in_query_string . "
+  //           GROUP BY
+  //            	w_2.word
+		// 	ORDER BY
+ 	// 			r_1.is_true
+ 	// 		DESC
+  //       	) second";
+		// echo PHP_EOL;
+		// $computer_response = 'hello world';
 		// var_dump($response_query);
 		// var_dump($text_data);
-		echo '<span class="middle_text">You said: ';
-		foreach ($text_structure as $part) { echo $part . ' '; }
-		echo '</span><br/>';
+		// echo '<span class="middle_text">You said: ';
+		// foreach ($text_structure as $part) { echo $part . ' '; }
+		// echo '</span><br/>';
 
 		// 
 		// Error stop point
@@ -289,3 +390,43 @@ class InterfaceController extends Controller {
 	}
 
 }
+
+// "SELECT * FROM
+// (SELECT
+// 			  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1,
+// 			  w_2.word as word_2, w_2.part as part_1, w_2.weight as weight_2, r_2.a_key as a_key_2, r_2.b_key as b_key_2
+// 			FROM
+// 			    contexts c
+// 			    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
+// 			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+// 			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+// 			WHERE
+// 			    w_1.id in (1, 4, 93)
+//             OR
+//             	w_2.id in (1, 4, 93)
+// 			ORDER BY
+//  				w_1.weight
+//  			DESC
+//             	) first
+
+// 			UNION
+
+// 			SELECT DISTINCT * FROM
+// 			(SELECT
+// 			  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3, r_1.a_key as a_key_3, r_1.b_key as b_key_3,
+// 			  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4, r_2.a_key as a_key_4, r_2.b_key as b_key_4
+// 			FROM
+// 			    contexts c
+// 			    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
+// 			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+// 			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+// 			WHERE
+// 			    w_1.id in (1, 4, 93)
+//             OR
+//             	w_2.id in (1, 4, 93)
+// 			ORDER BY
+//  				w_2.weight
+//  			DESC
+//         	) second
+
+//             	"
