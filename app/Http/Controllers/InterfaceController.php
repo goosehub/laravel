@@ -223,8 +223,11 @@ class InterfaceController extends Controller {
 		$in_query_string = '(';
 		foreach ($text_data as $text_data_iteration) 
 		{
-			$word_id_array[] = $text_data_iteration[0]->id;
-			$in_query_string .= $text_data_iteration[0]->id . ',';
+			if ($text_data_iteration[0]->weight < 20)
+			{
+				$word_id_array[] = $text_data_iteration[0]->id;
+				$in_query_string .= $text_data_iteration[0]->id . ',';
+			}
 		}
 		$in_query_string = rtrim($in_query_string, ',');
 		$in_query_string .= ')';
@@ -291,7 +294,7 @@ class InterfaceController extends Controller {
 			$response_count = count($response_query);
 			for ($response_i=0;$response_i<$response_count;$response_i++)
 			{
-				if ($response_query[$response_i]->weight_1 > 3)
+				if ($response_query[$response_i]->weight_1 > 1)
 				{
 					$computer_response .= $response_query[$response_i]->word_1 . ' ';
 				}
