@@ -82,8 +82,8 @@
 								<small>$of $with $like $who</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> | </strong>Pronouns</p>
-								<small>|I |me |you</small>
+								<p><strong class="part_symbol"> | </strong>Pronouns (Only these 4)</p>
+								<small>|I |me |you |my</small>
 							</div>
 							<div class="explain_bubble">
 								<p>Conjunctions are not yet possible </p>

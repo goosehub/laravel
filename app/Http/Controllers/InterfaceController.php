@@ -38,6 +38,8 @@ class InterfaceController extends Controller {
 		$text_input = str_replace('|I', '.' . $start, $text_input);
 		$text_input = str_replace('|i', '.' . $start, $text_input);
 		$text_input = str_replace('|me', '.' . $start, $text_input);
+		$text_input = str_replace('|my', '.' . $start, $text_input);
+		$text_input = str_replace('|My', '.' . $start, $text_input);
 		$text_input = str_replace('|You', '.Steve', $text_input);
 		$text_input = str_replace('|you', '.Steve', $text_input);
 
@@ -212,10 +214,8 @@ class InterfaceController extends Controller {
 		// Associations of connections
 		// 
 
-		var_dump($association_key);
-
 		$number_of_associations = count($association_key);
-		if ($association_key != 0)
+		if ($association_key != 0 && isset($current_connection) )
 		{
 			for($association_i=0; $association_i<$number_of_associations; $association_i++) 
 			// foreach ($association_key as $assoc_key)
@@ -245,7 +245,6 @@ class InterfaceController extends Controller {
 		// Iterate through words for relationships
 		// 
 
-/*
 		$context_array = '';
 		for($outer_relationship_i=0; $outer_relationship_i<$number_of_words; $outer_relationship_i++) 
 		{
@@ -280,13 +279,11 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
-*/
 
 		// 
 		// Iterate through relationships for context
 		// 
 
-/*
 		$number_of_context = count($context_array);
 		for($outer_context_i=0; $outer_context_i<$number_of_context; $outer_context_i++) 
 		{
@@ -318,101 +315,181 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
-*/
 
 		// 
-		// Computer response
+		// Find related connections
 		// 
 
-		// 
-		// Prep for query input
-		// 
+		$agent_key = $agent_key === 0 ? 999999999 : $agent_key;
+		$action_key = $action_key === 0 ? 999999999 : $action_key;
+		$object_key = $object_key === 0 ? 999999999 : $object_key;
 
-		$in_query_string = '(';
-		foreach ($text_data as $text_data_iteration) 
-		{
-			$word_id_array[] = $text_data_iteration[0]->id;
-			$in_query_string .= $text_data_iteration[0]->id . ',';
-		}
-		$in_query_string = rtrim($in_query_string, ',');
-		$in_query_string .= ')';
-
-		// 
-		// Do master computer response select query
-		// 
-
-/*
-		$response_query = DB::select("SELECT * FROM
-			(SELECT
-			  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1, r_1.id as r_id_1, c.y_key as c_y_1,
-			  w_2.word as word_2, w_2.part as part_2, w_2.weight as weight_2
-			FROM
-			    contexts c
-			    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
-			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
-			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
-			WHERE
-			    w_1.id in " . $in_query_string . "
-            OR
-            	w_2.id in " . $in_query_string . "
-            GROUP BY
-             	w_1.word
-			ORDER BY
- 				r_1.is_true
- 			DESC
-            	) first
-
-			UNION
-
-			SELECT * FROM
-			(SELECT
-			  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3,r_1.a_key as a_key_3, r_1.b_key as b_key_3,  r_1.id as r_id_3,  c.y_key as c_y_2,
-			  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4
-			FROM
-			    contexts c
-			    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
-			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
-			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
-			WHERE
-			    w_1.id in " . $in_query_string . "
-            OR
-            	w_2.id in " . $in_query_string . "
-            GROUP BY
-             	w_2.word
-			ORDER BY
- 				r_1.is_true
- 			DESC
-        	) second
+		$response_connection_query = DB::select("SELECT * FROM
+			`connections` where 
+			`agent_key` in (" . $agent_key . ", " . $object_key . ") 
+			or 'action_key' = " . $action_key . " and 'action_type' = '" . $action_type . "' 
+			or `object_key` in (" . $agent_key . ", " . $object_key . ") 
+			ORDER BY `is_true` DESC
+			LIMIT 2
 		;");
-*/
+		$response_connection_query = array_reverse($response_connection_query);
+		$response_association_query = [];
+		$response_agent_key = [];
+		$response_action_key = [];
+		$response_action_type = [];
+		$response_object_key = [];
+		$response_conn_is_true = [];
+		$response_conn_is_false = [];
+		$connection_assocaition_i = 0;
+		foreach ($response_connection_query as $r_c_q_i)
+		{
+			$response_association_query[$connection_assocaition_i][] = DB::select("SELECT * FROM
+				`associations` where 
+				`connection_key` = " . $r_c_q_i->id . "
+				ORDER BY `weight` DESC
+			;");
+			$connection_assocaition_i++;
+		}
 
 		// 
 		// Formulate computer response
-		//
+		// 
 
-/*
 		$computer_response = '';
-		// Halt if no response
-		if (!isset($response_query[0]->word_1) ) {}
-		else
+
+		// Agent
+		if ( isset($response_connection_query[0]->agent_key) && $response_connection_query[0]->agent_key != 0 )
 		{
-			// $subject = isset($noun[0][0]) ? $noun[0][0] : $text_data[0][0]->word;
-			// $computer_response = $subject . ' ' . $response_query[0]->word_1 . ' ' . $response_query[0]->word_2;
-			$response_count = count($response_query);
-			for ($response_i=0;$response_i<$response_count;$response_i++)
+			$current_id = $response_connection_query[0]->agent_key;
+			$current_part = 'noun';
+			$next_word = DB::select("SELECT * FROM `words` where `id` = " . $current_id . " and `part` = '" . $current_part . "';");
+			$computer_response .= $next_word[0]->word . ' ';			
+		}
+
+		// Action
+		if ( isset($response_connection_query[0]->action_key) && $response_connection_query[0]->action_key != 0 )
+		{
+			$current_id = $response_connection_query[0]->action_key;
+			$current_part = $response_connection_query[0]->action_type;
+			$next_word = DB::select("SELECT * FROM `words` where `id` = " . $current_id . " and `part` = '" . $current_part . "';");
+			$computer_response .= $next_word[0]->word . ' ';
+		}
+
+		// Association
+		if ( isset($response_association_query[0][0]->word_key) && $response_association_query[0][0]->weight > 2)
+		{
+			$current_id = $response_association_query[0][0]->word_key;
+			$current_part = $response_association_query[0][0]->word_type;
+			$next_word = DB::select("SELECT * FROM `words` where `id` = " . $current_id . " and `part` = '" . $current_part . "';");
+			$computer_response .= $next_word[0]->word . ' ';
+		}
+
+		// Object
+		if ( isset($response_connection_query[0]->object_key) && $response_connection_query[0]->object_key != 0 )
+		{
+			$current_id = $response_connection_query[0]->object_key;
+			$current_part = 'noun';
+			$next_word = DB::select("SELECT * FROM `words` where `id` = " . $current_id . " and `part` = '" . $current_part . "';");
+			$computer_response .= $next_word[0]->word . ' ';
+		}
+
+		// Create pronouns
+		$computer_response = str_replace('.steve', '.me', $computer_response);
+		$computer_response = str_replace('.' . $start, 'you', $computer_response);
+		$computer_response = str_replace('.1433', 'user_', $computer_response);
+
+		// 
+		// If no response, resort to relationships and contexts
+		// 
+
+		if ($computer_response === '')
+		{
+
+			// 
+			// Prep for query input
+			// 
+
+			$in_query_string = '(';
+			foreach ($text_data as $text_data_iteration) 
 			{
-				if ($response_query[$response_i]->weight_1 > 1)
+				$word_id_array[] = $text_data_iteration[0]->id;
+				$in_query_string .= $text_data_iteration[0]->id . ',';
+			}
+			$in_query_string = rtrim($in_query_string, ',');
+			$in_query_string .= ')';
+
+			// 
+			// Do master computer response select query
+			// 
+
+			$response_query = DB::select("SELECT * FROM
+				(SELECT
+				  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1, r_1.id as r_id_1, c.y_key as c_y_1,
+				  w_2.word as word_2, w_2.part as part_2, w_2.weight as weight_2
+				FROM
+				    contexts c
+				    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
+				    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+				    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+				WHERE
+				    w_1.id in " . $in_query_string . "
+	            OR
+	            	w_2.id in " . $in_query_string . "
+	            GROUP BY
+	             	w_1.word
+				ORDER BY
+	 				r_1.is_true
+	 			DESC
+	            	) first
+
+				UNION
+
+				SELECT * FROM
+				(SELECT
+				  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3,r_1.a_key as a_key_3, r_1.b_key as b_key_3,  r_1.id as r_id_3,  c.y_key as c_y_2,
+				  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4
+				FROM
+				    contexts c
+				    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
+				    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
+				    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
+				WHERE
+				    w_1.id in " . $in_query_string . "
+	            OR
+	            	w_2.id in " . $in_query_string . "
+	            GROUP BY
+	             	w_2.word
+				ORDER BY
+	 				r_1.is_true
+	 			DESC
+	        	) second
+			;");
+
+			// 
+			// Formulate computer response
+			//
+
+			$computer_response = '';
+			// Halt if no response
+			if (!isset($response_query[0]->word_1) ) {}
+			else
+			{
+				// $subject = isset($noun[0][0]) ? $noun[0][0] : $text_data[0][0]->word;
+				// $computer_response = $subject . ' ' . $response_query[0]->word_1 . ' ' . $response_query[0]->word_2;
+				$response_count = count($response_query);
+				for ($response_i=0;$response_i<$response_count;$response_i++)
 				{
-					$computer_response .= $response_query[$response_i]->word_1 . ' ';
-				}
-				else
-				{
-					$response_i = 99999999;
+					if ($response_query[$response_i]->weight_1 > 1)
+					{
+						$computer_response .= $response_query[$response_i]->word_1 . ' ';
+					}
+					else
+					{
+						$response_i = 99999999;
+					}
 				}
 			}
 		}
-*/
-
 
 		// If nothing is returned, stay silent
 		if ($computer_response === '') { $computer_response = '...'; }
