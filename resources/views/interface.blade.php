@@ -56,6 +56,10 @@
 								<small>=is =was =be =are </small>
 							</div>
 							<div class="explain_bubble">
+								<p><strong class="part_symbol"> ~ </strong>Have Verbs </p>
+								<small> ~have ~has ~had ~owns </small>
+							</div>
+							<div class="explain_bubble">
 								<p><strong class="part_symbol"> : </strong>Go Verbs </p>
 								<small> :go :come :went :bring </small>
 							</div>
@@ -78,8 +82,8 @@
 								<small>$of $with $like $who</small>
 							</div>
 							<div class="explain_bubble">
-								<p>Pronouns are not yet possible </p>
-								<small>this that him she</small>
+								<p><strong class="part_symbol"> | </strong>Pronouns</p>
+								<small>|I |me |you</small>
 							</div>
 							<div class="explain_bubble">
 								<p>Conjunctions are not yet possible </p>

@@ -34,6 +34,12 @@ class InterfaceController extends Controller {
 
 		$text_input = trim($text_input);
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
+		// Translate pronouns
+		$text_input = str_replace('|I', '.' . $start, $text_input);
+		$text_input = str_replace('|i', '.' . $start, $text_input);
+		$text_input = str_replace('|me', '.' . $start, $text_input);
+		$text_input = str_replace('|You', '.Steve', $text_input);
+		$text_input = str_replace('|you', '.Steve', $text_input);
 
 		// 
 		// Seperate sentence into parts of speech
@@ -44,6 +50,7 @@ class InterfaceController extends Controller {
 		preg_match_all('/=[\S]+/', $text_input, $is);
 		preg_match_all('/:[\S]+/', $text_input, $go);
 		preg_match_all('/;[\S]+/', $text_input, $make);
+		preg_match_all('/\~[\S]+/', $text_input, $have);
 		preg_match_all('/\*[\S]+/', $text_input, $adjective);
 		preg_match_all('/\`[\S]+/', $text_input, $article);
 		preg_match_all('/\+[\S]+/', $text_input, $cheer);
@@ -75,6 +82,7 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $is[0]) ) { $part = $text_structure[] = $display_word_part = 'is'; }
 			else if (in_array($text, $go[0]) ) { $part = $text_structure[] = $display_word_part = 'go'; }
 			else if (in_array($text, $make[0]) ) { $part = $text_structure[] = $display_word_part = 'make'; }
+			else if (in_array($text, $have[0]) ) { $part = $text_structure[] = $display_word_part = 'have'; }
 			else if (in_array($text, $adjective[0]) ) { $part = $text_structure[] = $display_word_part = 'adjective'; }
 			else if (in_array($text, $positive[0]) ) { $part = $text_structure[] = $display_word_part = 'positive'; }
 			else if (in_array($text, $negative[0]) ) { $part = $text_structure[] = $display_word_part = 'negative'; }
@@ -85,7 +93,7 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $article[0]) ) { $part = $text_structure[] = $display_word_part = 'article'; }
 			else if (in_array($text, $cheer[0]) ) { $part = $text_structure[] = $display_word_part = 'cheer'; }
 			else if (in_array($text, $jeer[0]) ) { $part = $text_structure[] = $display_word_part = 'jeer'; }
-			else { $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
+			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
 
 			// 
 			// Get word from DB, Insert if not found, increase weight if found
@@ -133,13 +141,111 @@ class InterfaceController extends Controller {
 		$is_true = count(array_keys($text_structure, 'negative')) > 0 ? false : TRUE;
 		$not_true = $is_true ? false : TRUE;
 
-		// Find number of words in sentece
+		// Find number of words in sentence
 		$number_of_words = count($text_structure);
+
+		// 
+		// Get agent action object
+		// 
+
+		$agent_key = 0;
+		$action_key = 0;
+		$action_type = '';
+		$object_key = 0;
+		$association_key = [];
+		$association_type = [];
+		for($connection_i=0; $connection_i<$number_of_words; $connection_i++) 
+		{
+			// If noun, no agent yet, and not a possessive
+			if ($text_data[$connection_i][0]->part === 'noun' && $agent_key === 0 && strpos($text_data[$connection_i][0]->part,'/s') === false ) 
+			{ 
+				$agent_key = $text_data[$connection_i][0]->id; 
+			}
+			// If a verb of some kind, and no object yet
+			else if ( ($text_data[$connection_i][0]->part === 'make' ||
+				$text_data[$connection_i][0]->part === 'do' ||
+				$text_data[$connection_i][0]->part === 'have' ||
+				$text_data[$connection_i][0]->part === 'go' ||
+				$text_data[$connection_i][0]->part === 'is' ) && $object_key === 0) 
+			{
+				$action_key = $text_data[$connection_i][0]->id;
+				$action_type = $text_data[$connection_i][0]->part;
+			}
+			// If noun, and action is found
+			else if ($text_data[$connection_i][0]->part === 'noun' && $action_key != 0) 
+			{ 
+				$object_key = $text_data[$connection_i][0]->id; 
+			}
+			else
+			{
+				$association_key[] = $text_data[$connection_i][0]->id;
+				$association_type[] = $text_data[$connection_i][0]->part;
+			}
+		}
+
+		// 
+		// Get connection from DB, Insert if not found, increase weight if found
+		// 
+		if ($agent_key != 0 && $action_key != 0)
+		{
+			$current_connection = $text_data[] = DB::select('select * from `connections` 
+				where agent_key = :agent_key and action_key = :action_key and action_type = :action_type and object_key = :object_key', 
+				['agent_key' => $agent_key, 'action_key' => $action_key, 'action_type' => $action_type, 'object_key' => $object_key]);
+
+			if (empty($current_connection) )
+			{
+				DB::insert('insert into `connections` (agent_key, action_key, action_type, object_key, is_true) 
+					values (:agent_key, :action_key, :action_type, :object_key, :is_true)', 
+					['agent_key' => $agent_key, 'action_key' => $action_key, 'action_type' => $action_type, 'object_key' => $object_key, 'is_true' => $is_true]);
+				$current_connection = DB::select('select * from `connections` 
+				where agent_key = :agent_key and action_key = :action_key and action_type = :action_type and object_key = :object_key', 
+				['agent_key' => $agent_key, 'action_key' => $action_key, 'action_type' => $action_type, 'object_key' => $object_key]);
+			}
+			else
+			{
+				if ($is_true) { DB::update('update `connections` set is_true = is_true + 1 where id = :id', ['id' => $current_connection[0]->id]); }
+				else { DB::update('update `connection` set not_true = not_true + 1 where id = :id', ['id' => $current_connection[0]->id]); }
+			}			
+		}
+
+		// 
+		// Associations of connections
+		// 
+
+		var_dump($association_key);
+
+		$number_of_associations = count($association_key);
+		if ($association_key != 0)
+		{
+			for($association_i=0; $association_i<$number_of_associations; $association_i++) 
+			// foreach ($association_key as $assoc_key)
+			{
+				$current_association = $text_data[] = DB::select('select * from `associations` 
+					where connection_key = :connection_key and word_key = :word_key and word_type = :word_type', 
+					['connection_key' => $current_connection[0]->id, 'word_key' => $association_key[$association_i], 'word_type' => $association_type[$association_i]]);
+
+				if (empty($current_association) )
+				{
+					DB::insert('insert into `associations` (connection_key, word_key, word_type, weight) 
+						values (:connection_key, :word_key, :word_type, :weight)', 
+						['connection_key' => $current_connection[0]->id, 'word_key' => $association_key[$association_i], 
+						'word_type' => $association_type[$association_i], 'weight' => 1]);
+					$current_association = $text_data[] = DB::select('select * from `associations` 
+					where connection_key = :connection_key and word_key = :word_key and word_type = :word_type', 
+					['connection_key' => $current_connection[0]->id, 'word_key' => $association_key[$association_i], 'word_type' => $association_type[$association_i]]);
+				}
+				else
+				{
+					DB::update('update `associations` set weight = weight + 1 where id = :id', ['id' => $current_association[0]->id]);
+				}
+			}			
+		}
 
 		// 
 		// Iterate through words for relationships
 		// 
 
+/*
 		$context_array = '';
 		for($outer_relationship_i=0; $outer_relationship_i<$number_of_words; $outer_relationship_i++) 
 		{
@@ -174,11 +280,13 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
+*/
 
 		// 
 		// Iterate through relationships for context
 		// 
 
+/*
 		$number_of_context = count($context_array);
 		for($outer_context_i=0; $outer_context_i<$number_of_context; $outer_context_i++) 
 		{
@@ -210,7 +318,7 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
-
+*/
 
 		// 
 		// Computer response
@@ -223,11 +331,8 @@ class InterfaceController extends Controller {
 		$in_query_string = '(';
 		foreach ($text_data as $text_data_iteration) 
 		{
-			if ($text_data_iteration[0]->weight < 20)
-			{
-				$word_id_array[] = $text_data_iteration[0]->id;
-				$in_query_string .= $text_data_iteration[0]->id . ',';
-			}
+			$word_id_array[] = $text_data_iteration[0]->id;
+			$in_query_string .= $text_data_iteration[0]->id . ',';
 		}
 		$in_query_string = rtrim($in_query_string, ',');
 		$in_query_string .= ')';
@@ -236,6 +341,7 @@ class InterfaceController extends Controller {
 		// Do master computer response select query
 		// 
 
+/*
 		$response_query = DB::select("SELECT * FROM
 			(SELECT
 			  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1, r_1.id as r_id_1, c.y_key as c_y_1,
@@ -278,15 +384,16 @@ class InterfaceController extends Controller {
  			DESC
         	) second
 		;");
+*/
 
 		// 
 		// Formulate computer response
 		//
 
+/*
 		$computer_response = '';
 		// Halt if no response
-		if (!isset($response_query[0]->word_1) ) {
-		}
+		if (!isset($response_query[0]->word_1) ) {}
 		else
 		{
 			// $subject = isset($noun[0][0]) ? $noun[0][0] : $text_data[0][0]->word;
@@ -304,6 +411,9 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
+*/
+
+
 		// If nothing is returned, stay silent
 		if ($computer_response === '') { $computer_response = '...'; }
 
@@ -311,47 +421,6 @@ class InterfaceController extends Controller {
 		// Debug
 		// 
 
-		// echo "SELECT * FROM
-		// (SELECT
-		// 	  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1, r_1.id as r_id_1, c.y_key as c_y_1,
-		// 	  w_2.word as word_2, w_2.part as part_2, w_2.weight as weight_2
-		// 	FROM
-		// 	    contexts c
-		// 	    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
-		// 	    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
-		// 	    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
-		// 	WHERE
-		// 	    w_1.id in " . $in_query_string . "
-  //           OR
-  //           	w_2.id in " . $in_query_string . "
-  //           GROUP BY
-  //            	w_1.word
-		// 	ORDER BY
- 	// 			r_1.is_true
- 	// 		DESC
-  //           	) first
-
-		// 	UNION
-
-		// 	SELECT * FROM
-		// 	(SELECT
-		// 	  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3,r_1.a_key as a_key_3, r_1.b_key as b_key_3,  r_1.id as r_id_3,  c.y_key as c_y_2,
-		// 	  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4
-		// 	FROM
-		// 	    contexts c
-		// 	    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
-		// 	    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
-		// 	    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
-		// 	WHERE
-		// 	    w_1.id in " . $in_query_string . "
-  //           OR
-  //           	w_2.id in " . $in_query_string . "
-  //           GROUP BY
-  //            	w_2.word
-		// 	ORDER BY
- 	// 			r_1.is_true
- 	// 		DESC
-  //       	) second";
 		// echo PHP_EOL;
 		// $computer_response = 'hello world';
 		// var_dump($response_query);
@@ -393,43 +462,3 @@ class InterfaceController extends Controller {
 	}
 
 }
-
-// "SELECT * FROM
-// (SELECT
-// 			  w_1.word as word_1, w_1.part as part_1, w_1.weight as weight_1, r_1.a_key as a_key_1, r_1.b_key as b_key_1,
-// 			  w_2.word as word_2, w_2.part as part_1, w_2.weight as weight_2, r_2.a_key as a_key_2, r_2.b_key as b_key_2
-// 			FROM
-// 			    contexts c
-// 			    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
-// 			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
-// 			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
-// 			WHERE
-// 			    w_1.id in (1, 4, 93)
-//             OR
-//             	w_2.id in (1, 4, 93)
-// 			ORDER BY
-//  				w_1.weight
-//  			DESC
-//             	) first
-
-// 			UNION
-
-// 			SELECT DISTINCT * FROM
-// 			(SELECT
-// 			  w_1.word as word_3, w_1.part as part_3, w_1.weight as weight_3, r_1.a_key as a_key_3, r_1.b_key as b_key_3,
-// 			  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4, r_2.a_key as a_key_4, r_2.b_key as b_key_4
-// 			FROM
-// 			    contexts c
-// 			    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
-// 			    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
-// 			    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
-// 			WHERE
-// 			    w_1.id in (1, 4, 93)
-//             OR
-//             	w_2.id in (1, 4, 93)
-// 			ORDER BY
-//  				w_2.weight
-//  			DESC
-//         	) second
-
-//             	"
