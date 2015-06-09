@@ -20,18 +20,40 @@
 					</form>
 					<h2>Language Key</h2>
 					<div class="row">
-						<div class="col-md-3">
+						<div class="col-md-4">
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> . </strong>Nouns </p>
-								<small>.Steve .Paris .water .people .time</small>
+								<p><strong class="part_symbol"> ; </strong>Nouns </p>
+								<small>;Steve ;Paris ;water ;people ;time</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> # </strong>Action Verbs </p>
+								<small>#do #does #did #act </small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> = </strong>Equivalent Verbs </p>
+								<small>=is =was =be =are </small>
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> * </strong>Adjectives </p>
 								<small>*beautiful *funny *evil *fourtytwo *7</small>
 							</div>
 							<div class="explain_bubble">
-								<strong class="part_symbol"> ` </strong><p>Articles </p>
-								<small>`the `a `an</small>
+								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
+								<small>?why ?does ?will ?who</small>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> $ </strong>Articles (There's only 3)</p>
+								<small>$the $a $an</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> : </strong>Pronouns (Only these 4)</p>
+								<small>:I :me :you :my</small>
+							</div>
+							<div class="explain_bubble">
+								<p><strong class="part_symbol"> @ </strong>Prepositions</p>
+								<small>@at @on $with $like</small>
 							</div>
 							<div class="explain_bubble">
 								<strong class="part_symbol"> + </strong>or<strong> - </strong><p>Cheers and Jeers </p>
@@ -41,49 +63,23 @@
 								<strong class="part_symbol"> ++ </strong>or<strong> -- </strong><p>Positive and Negative </p>
 								<small>++yes --no</small>
 							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
-								<small>?why ?does ?will ?who</small>
-							</div>
 						</div>
-						<div class="col-md-3">
+						<div class="col-md-4">
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ! </strong>Do Verbs </p>
-								<small>!do !does !did !act </small>
+								<p><strong class="part_symbol"> _ </strong>Connector</p>
+								<small>William_Shakespear</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> = </strong>Is Verbs </p>
-								<small>=is =was =be =are </small>
+								<p><strong class="part_symbol"> \s </strong>Possessives</p>
+								<small>bob\s boston\s</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ~ </strong>Have Verbs </p>
-								<small> ~have ~has ~had ~owns </small>
+								<p><strong class="part_symbol"> /s </strong>Plurals</p>
+								<small>car/s monkey/s</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> : </strong>Go Verbs </p>
-								<small> :go :come :went :bring </small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ; </strong>Make Verbs </p>
-								<small> ;make ;create ;cause ;bring </small>
-							</div>
-						</div>
-						<div class="col-md-3">
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> @ </strong>Prepositions of Time</p>
-								<small>@at @on</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> # </strong>Prepositions of Space</p>
-								<small>#at #on</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> $ </strong>Prepositions of Relation</p>
-								<small>$of $with $like $who</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> | </strong>Pronouns (Only these 4)</p>
-								<small>|I |me |you |my</small>
+								<p><strong class="part_symbol"> |s </strong>Perspective</p>
+								<small>want|s |give|s</small>
 							</div>
 							<div class="explain_bubble">
 								<p>Conjunctions are not yet possible </p>
@@ -93,21 +89,7 @@
 								<p>Contractions are not yet possible </p>
 								<small>don't it's isn't</small>
 							</div>
-						</div>
-						<div class="col-md-3">
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> _ </strong>Connector</p>
-								<small>William_Shakespear</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> /s </strong>Possessives</p>
-								<small>bob/s boston/s</small>
-							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol">\s </strong>Plurals</p>
-								<small>car\s monkey\s</small>
-							</div>
-							<div class="explain_bubble">
+<!-- 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> < </strong>Past Tense</p>
 								<small>!did< .WW2< </small>
 							</div>
@@ -122,7 +104,7 @@
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> % </strong>Interval</p>
 								<small>.Super_Bowl% !frequently</small>
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>

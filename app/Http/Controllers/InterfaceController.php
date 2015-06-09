@@ -34,35 +34,39 @@ class InterfaceController extends Controller {
 
 		$text_input = trim($text_input);
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
+
+		// 
 		// Translate pronouns
-		$text_input = str_replace('|I', '.' . $start, $text_input);
-		$text_input = str_replace('|i', '.' . $start, $text_input);
-		$text_input = str_replace('|me', '.' . $start, $text_input);
-		$text_input = str_replace('|my', '.' . $start, $text_input);
-		$text_input = str_replace('|My', '.' . $start, $text_input);
-		$text_input = str_replace('|You', '.Steve', $text_input);
-		$text_input = str_replace('|you', '.Steve', $text_input);
+		// 
+
+		$text_input = str_replace(':I', ';' . $start, $text_input);
+		$text_input = str_replace(':i', ';' . $start, $text_input);
+		$text_input = str_replace(':me', ';' . $start, $text_input);
+		$text_input = str_replace(':my', ';' . $start, $text_input);
+		$text_input = str_replace(':My', ';' . $start, $text_input);
+		$text_input = str_replace(':You', ';Steve', $text_input);
+		$text_input = str_replace(':you', ';Steve', $text_input);
+
+		// 
+		// Translate contractions
+		// 
+
+		// not yet coded
 
 		// 
 		// Seperate sentence into parts of speech
 		// 
-
-		preg_match_all('/\.[\S]+/', $text_input, $noun);
-		preg_match_all('/![\S]+/', $text_input, $do);
-		preg_match_all('/=[\S]+/', $text_input, $is);
-		preg_match_all('/:[\S]+/', $text_input, $go);
-		preg_match_all('/;[\S]+/', $text_input, $make);
-		preg_match_all('/\~[\S]+/', $text_input, $have);
+		preg_match_all('/;[\S]+/', $text_input, $noun);
+		preg_match_all('/#[\S]+/', $text_input, $action);
+		preg_match_all('/=[\S]+/', $text_input, $equate);
 		preg_match_all('/\*[\S]+/', $text_input, $adjective);
-		preg_match_all('/\`[\S]+/', $text_input, $article);
+		preg_match_all('/\$[\S]+/', $text_input, $article);
 		preg_match_all('/\+[\S]+/', $text_input, $cheer);
 		preg_match_all('/-[\S]+/', $text_input, $jeer);
 		preg_match_all('/\+\+[\S]+/', $text_input, $positive);
 		preg_match_all('/--[\S]+/', $text_input, $negative);
+		preg_match_all('/@[\S]+/', $text_input, $preposition);
 		preg_match_all('/\?[\S]+/', $text_input, $inquiry);
-		preg_match_all('/@[\S]+/', $text_input, $time);
-		preg_match_all('/#[\S]+/', $text_input, $space);
-		preg_match_all('/\$[\S]+/', $text_input, $relation);
 
 		// 
 		// Iterate through each word of the sentence
@@ -70,6 +74,9 @@ class InterfaceController extends Controller {
 
 		// Split into words
 		$words = explode(' ', $text_input);
+
+		// Declare as declarative until found otherwise
+		$type_of_sentence = 'declarative';
 
 		$text_structure = [];
 		foreach ($words as $text)
@@ -79,33 +86,50 @@ class InterfaceController extends Controller {
 			// 
 
 			// echo in_array($text, $noun);
-			if (in_array($text, $noun[0]) ) { $part = $text_structure[] = $display_word_part = 'noun'; }
-			else if (in_array($text, $do[0]) ) { $part = $text_structure[] = $display_word_part = 'do'; }
-			else if (in_array($text, $is[0]) ) { $part = $text_structure[] = $display_word_part = 'is'; }
-			else if (in_array($text, $go[0]) ) { $part = $text_structure[] = $display_word_part = 'go'; }
-			else if (in_array($text, $make[0]) ) { $part = $text_structure[] = $display_word_part = 'make'; }
-			else if (in_array($text, $have[0]) ) { $part = $text_structure[] = $display_word_part = 'have'; }
-			else if (in_array($text, $adjective[0]) ) { $part = $text_structure[] = $display_word_part = 'adjective'; }
-			else if (in_array($text, $positive[0]) ) { $part = $text_structure[] = $display_word_part = 'positive'; }
-			else if (in_array($text, $negative[0]) ) { $part = $text_structure[] = $display_word_part = 'negative'; }
-			else if (in_array($text, $time[0]) ) { $part = $text_structure[] = $display_word_part = 'time'; }
-			else if (in_array($text, $space[0]) ) { $part = $text_structure[] = $display_word_part = 'space'; }
-			else if (in_array($text, $relation[0]) ) { $part = $text_structure[] = $display_word_part = 'relation'; }
-			else if (in_array($text, $inquiry[0]) ) { $part = $text_structure[] = $display_word_part = 'inquiry'; }
-			else if (in_array($text, $article[0]) ) { $part = $text_structure[] = $display_word_part = 'article'; }
-			else if (in_array($text, $cheer[0]) ) { $part = $text_structure[] = $display_word_part = 'cheer'; }
-			else if (in_array($text, $jeer[0]) ) { $part = $text_structure[] = $display_word_part = 'jeer'; }
+			if (in_array($text, $noun[0]) ) { $part = $text_structure[] = 'noun'; }
+			else if (in_array($text, $do[0]) ) { $part = $text_structure[] = 'action'; }
+			else if (in_array($text, $is[0]) ) { $part = $text_structure[] = 'equate'; }
+			else if (in_array($text, $go[0]) ) { $part = $text_structure[] = 'adjective'; }
+			else if (in_array($text, $have[0]) ) { $part = $text_structure[] = 'cheer'; }
+			else if (in_array($text, $adjective[0]) ) { $part = $text_structure[] = 'jeer'; }
+			else if (in_array($text, $positive[0]) ) { $part = $text_structure[] = 'positive'; }
+			else if (in_array($text, $negative[0]) ) { $part = $text_structure[] = 'negative'; }
+			else if (in_array($text, $time[0]) ) { $part = $text_structure[] = 'preposition'; }
+			else if (in_array($text, $space[0]) ) { $part = $text_structure[] = 'inquiry'; }
+			else if (in_array($text, $make[0]) ) { $part = 'article'; }
+			// Articles are discarded
 			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
+
+			// 
+			// Find type of sentence is non declarative
+			// 
+			if (in_array('inquiry', $text_structure) )
+			{
+				$type_of_sentence = 'interrogative';
+			}
+			else if (! isset($type_of_sentence) && $text_structure[0] === 'action')
+			{
+				$type_of_sentence = 'imperative';
+			}
+
+			// 
+			// Find properties of word based on user suffixes
+			// 
+
+			$plural = strpos($text, '\s');
+			$possessive = strpos($text, '/s');
+			$perspective = strpos($text, '|s');
+			// $past = strpos($text, '<');
+			// $present = strpos($text, '^');
+			// $future = strpos($text, '>');
+			// $interval = strpos($text, '%');
 
 			// 
 			// Get word from DB, Insert if not found, increase weight if found
 			// 
 
-			if ($part != 'article')
-			{
-				$current_found = $text_data[] = DB::select('select * from `words` where word = :word and part = :part', ['word' => $text, 'part' => $part]);
-			}
-
+			$current_found = $text_data[] = DB::select('select * from `words` where word = :word and part = :part', ['word' => $text, 'part' => $part]);
+			
 			if (empty($current_found) )
 			{
 				array_pop($text_data);
@@ -117,18 +141,10 @@ class InterfaceController extends Controller {
 				DB::update('update `words` set weight = weight + 1 where id = :id', ['id' => $current_found[0]->id]);
 			}
 
-			// 
-			// Find properties of word based on user suffixes
-			// 
-
-			$plural = strpos($text, '\s');
-			$possessive = strpos($text, '/s');
-			$past = strpos($text, '<');
-			$present = strpos($text, '^');
-			$future = strpos($text, '>');
-			$interval = strpos($text, '%');
-
 		}
+
+		// debug
+		var_dump($type_of_sentence);
 
 		// 
 		// Gather information and prep sentence
@@ -164,11 +180,9 @@ class InterfaceController extends Controller {
 				$agent_key = $text_data[$connection_i][0]->id; 
 			}
 			// If a verb of some kind, and no object yet
-			else if ( ($text_data[$connection_i][0]->part === 'make' ||
-				$text_data[$connection_i][0]->part === 'do' ||
-				$text_data[$connection_i][0]->part === 'have' ||
-				$text_data[$connection_i][0]->part === 'go' ||
-				$text_data[$connection_i][0]->part === 'is' ) && $object_key === 0) 
+			else if ( ($text_data[$connection_i][0]->part === 'action' ||
+				$text_data[$connection_i][0]->part === 'equate') && 
+				$object_key === 0) 
 			{
 				$action_key = $text_data[$connection_i][0]->id;
 				$action_type = $text_data[$connection_i][0]->part;
@@ -324,13 +338,15 @@ class InterfaceController extends Controller {
 		$action_key = $action_key === 0 ? 999999999 : $action_key;
 		$object_key = $object_key === 0 ? 999999999 : $object_key;
 
-		$response_connection_query = DB::select("SELECT * FROM
+		$response_connection_query = DB::select("SELECT * FROM (
+			SELECT * FROM
 			`connections` where 
 			`agent_key` in (" . $agent_key . ", " . $object_key . ") 
 			or 'action_key' = " . $action_key . " and 'action_type' = '" . $action_type . "' 
 			or `object_key` in (" . $agent_key . ", " . $object_key . ") 
 			ORDER BY `is_true` DESC
-			LIMIT 2
+			LIMIT 10 ) as result
+			ORDER BY RAND()
 		;");
 		$response_connection_query = array_reverse($response_connection_query);
 		$response_association_query = [];
@@ -350,6 +366,8 @@ class InterfaceController extends Controller {
 			;");
 			$connection_assocaition_i++;
 		}
+
+		// var_dump($response_association_query[0][0][0]->word_key);
 
 		// 
 		// Formulate computer response
@@ -376,10 +394,11 @@ class InterfaceController extends Controller {
 		}
 
 		// Association
-		if ( isset($response_association_query[0][0]->word_key) && $response_association_query[0][0]->weight > 2)
+		if ( isset($response_association_query[0][0][0]->word_key) )
 		{
-			$current_id = $response_association_query[0][0]->word_key;
-			$current_part = $response_association_query[0][0]->word_type;
+			// echo '<h1>if associations happened</h1>';
+			$current_id = $response_association_query[0][0][0]->word_key;
+			$current_part = $response_association_query[0][0][0]->word_type;
 			$next_word = DB::select("SELECT * FROM `words` where `id` = " . $current_id . " and `part` = '" . $current_part . "';");
 			$computer_response .= $next_word[0]->word . ' ';
 		}
@@ -394,9 +413,12 @@ class InterfaceController extends Controller {
 		}
 
 		// Create pronouns
-		$computer_response = str_replace('.steve', '.me', $computer_response);
-		$computer_response = str_replace('.' . $start, 'you', $computer_response);
-		$computer_response = str_replace('.1433', 'user_', $computer_response);
+		// Self
+		$computer_response = str_replace(';steve', '.me', $computer_response);
+		// Current User
+		$computer_response = str_replace(';' . $start, 'you', $computer_response);
+		// Past User
+		$computer_response = str_replace(';1433', 'user_', $computer_response);
 
 		// 
 		// If no response, resort to relationships and contexts
@@ -463,6 +485,7 @@ class InterfaceController extends Controller {
 	 				r_1.is_true
 	 			DESC
 	        	) second
+				LIMIT 6
 			;");
 
 			// 
