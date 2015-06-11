@@ -26,6 +26,10 @@
 								<small>;Steve ;Paris ;water ;people ;time</small>
 							</div>
 							<div class="explain_bubble">
+								<p><strong class="part_symbol"> ; </strong>Pronouns (Only these 4)</p>
+								<small>;I ;me ;you ;my</small>
+							</div>
+							<div class="explain_bubble">
 								<p><strong class="part_symbol"> # </strong>Action Verbs </p>
 								<small>#do #does #did #act </small>
 							</div>
@@ -37,10 +41,6 @@
 								<p><strong class="part_symbol"> * </strong>Adjectives </p>
 								<small>*beautiful *funny *evil *fourtytwo *7</small>
 							</div>
-							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
-								<small>?why ?does ?will ?who</small>
-							</div>
 						</div>
 						<div class="col-md-4">
 							<div class="explain_bubble">
@@ -48,8 +48,8 @@
 								<small>$the $a $an</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> : </strong>Pronouns (Only these 4)</p>
-								<small>:I :me :you :my</small>
+								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
+								<small>?why ?does ?will ?who</small>
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> @ </strong>Prepositions</p>

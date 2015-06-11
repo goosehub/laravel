@@ -36,16 +36,30 @@ class InterfaceController extends Controller {
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
 
 		// 
+		// Articles, Perspective because it communicates redundent information
+		// 
+
+		$text_input = str_replace('$a ', '', $text_input);
+		$text_input = str_replace('$A ', '', $text_input);
+		$text_input = str_replace('$an ', '', $text_input);
+		$text_input = str_replace('$An ', '', $text_input);
+		$text_input = str_replace('$the ', '', $text_input);
+		$text_input = str_replace('$The ', '', $text_input);
+		$text_input = str_replace('|s', '', $text_input);
+
+		// 
 		// Translate pronouns
 		// 
 
-		$text_input = str_replace(':I', ';' . $start, $text_input);
-		$text_input = str_replace(':i', ';' . $start, $text_input);
-		$text_input = str_replace(':me', ';' . $start, $text_input);
-		$text_input = str_replace(':my', ';' . $start, $text_input);
-		$text_input = str_replace(':My', ';' . $start, $text_input);
-		$text_input = str_replace(':You', ';Steve', $text_input);
-		$text_input = str_replace(':you', ';Steve', $text_input);
+		$text_input = str_replace(';i', ';' . $start, $text_input);
+		$text_input = str_replace(';I', ';' . $start, $text_input);
+		$text_input = str_replace(';me', ';' . $start, $text_input);
+		$text_input = str_replace(';Me', ';' . $start, $text_input);
+		$text_input = str_replace(';my', ';' . $start, $text_input);
+		$text_input = str_replace(';My', ';' . $start, $text_input);
+		$text_input = str_replace(';you', ';Steve', $text_input);
+		$text_input = str_replace(';You', ';Steve', $text_input);
+		$text_input = str_replace(';steve', ';Steve', $text_input);
 
 		// 
 		// Translate contractions
@@ -60,7 +74,6 @@ class InterfaceController extends Controller {
 		preg_match_all('/#[\S]+/', $text_input, $action);
 		preg_match_all('/=[\S]+/', $text_input, $equate);
 		preg_match_all('/\*[\S]+/', $text_input, $adjective);
-		preg_match_all('/\$[\S]+/', $text_input, $article);
 		preg_match_all('/\+[\S]+/', $text_input, $cheer);
 		preg_match_all('/-[\S]+/', $text_input, $jeer);
 		preg_match_all('/\+\+[\S]+/', $text_input, $positive);
@@ -75,8 +88,15 @@ class InterfaceController extends Controller {
 		// Split into words
 		$words = explode(' ', $text_input);
 
+		// Find number of words in sentence
+		$number_of_words = count($words);
+		var_dump($number_of_words);
+
 		// Declare as declarative until found otherwise
 		$type_of_sentence = 'declarative';
+
+		// Check to see if sentence is exclamatory
+		if (count($cheer) + count($jeer) >= $number_of_words / 2 ) { $type_of_sentence = 'exclamatory'; }
 
 		$text_structure = [];
 		foreach ($words as $text)
@@ -87,30 +107,22 @@ class InterfaceController extends Controller {
 
 			// echo in_array($text, $noun);
 			if (in_array($text, $noun[0]) ) { $part = $text_structure[] = 'noun'; }
-			else if (in_array($text, $do[0]) ) { $part = $text_structure[] = 'action'; }
-			else if (in_array($text, $is[0]) ) { $part = $text_structure[] = 'equate'; }
-			else if (in_array($text, $go[0]) ) { $part = $text_structure[] = 'adjective'; }
-			else if (in_array($text, $have[0]) ) { $part = $text_structure[] = 'cheer'; }
-			else if (in_array($text, $adjective[0]) ) { $part = $text_structure[] = 'jeer'; }
+			else if (in_array($text, $action[0]) ) { $part = $text_structure[] = 'action'; }
+			else if (in_array($text, $equate[0]) ) { $part = $text_structure[] = 'equate'; }
+			else if (in_array($text, $adjective[0]) ) { $part = $text_structure[] = 'adjective'; }
+			else if (in_array($text, $cheer[0]) ) { $part = $text_structure[] = 'cheer'; }
+			else if (in_array($text, $jeer[0]) ) { $part = $text_structure[] = 'jeer'; }
 			else if (in_array($text, $positive[0]) ) { $part = $text_structure[] = 'positive'; }
 			else if (in_array($text, $negative[0]) ) { $part = $text_structure[] = 'negative'; }
-			else if (in_array($text, $time[0]) ) { $part = $text_structure[] = 'preposition'; }
-			else if (in_array($text, $space[0]) ) { $part = $text_structure[] = 'inquiry'; }
-			else if (in_array($text, $make[0]) ) { $part = 'article'; }
-			// Articles are discarded
+			else if (in_array($text, $preposition[0]) ) { $part = $text_structure[] = 'preposition'; }
+			else if (in_array($text, $inquiry[0]) ) { $part = $text_structure[] = 'inquiry'; }
 			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
 
 			// 
 			// Find type of sentence is non declarative
 			// 
-			if (in_array('inquiry', $text_structure) )
-			{
-				$type_of_sentence = 'interrogative';
-			}
-			else if (! isset($type_of_sentence) && $text_structure[0] === 'action')
-			{
-				$type_of_sentence = 'imperative';
-			}
+			if (in_array('inquiry', $text_structure) ) { $type_of_sentence = 'interrogative'; }
+			else if ($type_of_sentence != 'interrogative' && $text_structure[0] === 'action') { $type_of_sentence = 'imperative'; }
 
 			// 
 			// Find properties of word based on user suffixes
@@ -150,17 +162,10 @@ class InterfaceController extends Controller {
 		// Gather information and prep sentence
 		// 
 
-		// Remove articles (for alpha only)
-		$found_articles = array_keys($text_structure, 'article');
-		foreach ($found_articles as $found_article) { unset($text_structure[$found_article]); }
-
 		// Determine if positive or negative connontation
 		// Currently does not account for double negatives
 		$is_true = count(array_keys($text_structure, 'negative')) > 0 ? false : TRUE;
 		$not_true = $is_true ? false : TRUE;
-
-		// Find number of words in sentence
-		$number_of_words = count($text_structure);
 
 		// 
 		// Get agent action object
