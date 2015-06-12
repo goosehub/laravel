@@ -20,6 +20,23 @@ Time
 Teach top 100 words, verbs, nouns
 Contractions
 
+weight
+truth
+sentiment
+cheers and jeers
+amount
+subject
+action_adjective
+preposition
+adverb
+infinitive
+action
+equate
+possesses
+object_adjective
+object
+timeframe_start
+timeframe_end
 
 =========================================================================
 Language Documentation

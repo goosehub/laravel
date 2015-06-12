@@ -46,6 +46,8 @@ class InterfaceController extends Controller {
 		$text_input = str_replace('$the ', '', $text_input);
 		$text_input = str_replace('$The ', '', $text_input);
 		$text_input = str_replace('|s', '', $text_input);
+		$text_input = str_replace('\s', ' \possesses', $text_input);
+		$text_input = str_replace('/s', '/amount', $text_input);
 
 		// 
 		// Translate pronouns
@@ -80,6 +82,8 @@ class InterfaceController extends Controller {
 		preg_match_all('/--[\S]+/', $text_input, $negative);
 		preg_match_all('/@[\S]+/', $text_input, $preposition);
 		preg_match_all('/\?[\S]+/', $text_input, $inquiry);
+		preg_match_all('/\\\[\S]+/', $text_input, $possesses);
+		preg_match_all('/\/[\S]+/', $text_input, $amount);
 
 		// 
 		// Iterate through each word of the sentence
@@ -90,7 +94,6 @@ class InterfaceController extends Controller {
 
 		// Find number of words in sentence
 		$number_of_words = count($words);
-		var_dump($number_of_words);
 
 		// Declare as declarative until found otherwise
 		$type_of_sentence = 'declarative';
@@ -116,21 +119,19 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $negative[0]) ) { $part = $text_structure[] = 'negative'; }
 			else if (in_array($text, $preposition[0]) ) { $part = $text_structure[] = 'preposition'; }
 			else if (in_array($text, $inquiry[0]) ) { $part = $text_structure[] = 'inquiry'; }
+			else if (in_array($text, $possesses[0]) ) { $part = $text_structure[] = 'possesses'; }
+			else if (in_array($text, $amount[0]) ) { $part = $text_structure[] = 'amount'; }
 			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
 
-			// 
-			// Find type of sentence is non declarative
-			// 
+			// Find is sentence is interrogative
 			if (in_array('inquiry', $text_structure) ) { $type_of_sentence = 'interrogative'; }
+			// Find is sentence is imperative
 			else if ($type_of_sentence != 'interrogative' && $text_structure[0] === 'action') { $type_of_sentence = 'imperative'; }
 
 			// 
 			// Find properties of word based on user suffixes
 			// 
 
-			$plural = strpos($text, '\s');
-			$possessive = strpos($text, '/s');
-			$perspective = strpos($text, '|s');
 			// $past = strpos($text, '<');
 			// $present = strpos($text, '^');
 			// $future = strpos($text, '>');
@@ -156,17 +157,80 @@ class InterfaceController extends Controller {
 		}
 
 		// debug
-		var_dump($type_of_sentence);
+
+		// 
+		// 
+		// Find and store subject verb object relationships
+		// 
+		// 
+
+		$svo = '';
+		$svo_complete = false;
+		$svo_i = 0;
+		$svo[$svo_i]['subject_type'] = 'word';
+		$svo[$svo_i]['object_type'] = 'word';
+		$svo[$svo_i]['amount'] = 'unknown';
+		$svo[$svo_i]['negative'] = '';
+		$svo[$svo_i]['positive'] = '';
+		$svo[$svo_i]['cheer'] = '';
+		$svo[$svo_i]['jeer'] = '';
+		for($f_i=0; $f_i<$number_of_words; $f_i++) 
+		{
+			// subject if noun and subject isn't set
+			if ($text_data[$f_i][0]->part === 'noun' && ! isset($svo[$svo_i]['subject']) ) { $svo[$svo_i]['subject'] = $text_data[$f_i][0]->id; }
+			// possesses true if possesses
+			if ($text_data[$f_i][0]->part === 'possesses') { $svo[$svo_i]['possesses'] = true; }
+			// subject replaced if noun and possesses exists
+			if ($text_data[$f_i][0]->part === 'noun' && isset($svo[$svo_i]['possesses']) ) { $svo[$svo_i]['subject'] = $text_data[$f_i][0]->id; }
+			// action adjective if adjective and verb
+			if ($text_data[$f_i][0]->part === 'adjective' && isset($svo[$svo_i]['verb']) ) { $svo[$svo_i]['action_adjective'] = $text_data[$f_i][0]->id; }
+			// action if action and action isn't set
+			if ($text_data[$f_i][0]->part === 'action' && ! isset($svo[$svo_i]['action']) ) { $svo[$svo_i]['action'] = $text_data[$f_i][0]->id; }
+			// adverb if verb and action is already set
+			if ($text_data[$f_i][0]->part === 'action' && isset($svo[$svo_i]['action']) ) { $svo[$svo_i]['adverb'] = $text_data[$f_i][0]->id; }
+			// infinitive if action and adverb is already set
+			if ($text_data[$f_i][0]->part === 'action' && isset($svo[$svo_i]['adverb']) ) { $svo[$svo_i]['infinitive'] = $text_data[$f_i][0]->id; }
+			// object adjective if adjective and action is set
+			if ($text_data[$f_i][0]->part === 'adjective' && isset($svo[$svo_i]['action']) ) { $svo[$svo_i]['object_adjective'] = $text_data[$f_i][0]->id; }
+			// object if noun and object not set
+			if ($text_data[$f_i][0]->part === 'noun' && isset($svo[$svo_i]['object']) ) { $svo[$svo_i]['object'] = $text_data[$f_i][0]->id; }
+			// preposition if preposition
+			if ($text_data[$f_i][0]->part === 'preposition') { $svo[$svo_i]['preposition'] = $text_data[$f_i][0]->id; }
+			// equate if equate
+			if ($text_data[$f_i][0]->part === 'equate') { $svo[$svo_i]['equate'] = true; }
+			// Count cheer
+			if ($text_data[$f_i][0]->part === 'cheer') { $svo[$svo_i]['cheer'][] = true; }
+			// Count jeer
+			if ($text_data[$f_i][0]->part === 'jeer') { $svo[$svo_i]['jeer'][] = true; }
+			// Count positive
+			if ($text_data[$f_i][0]->part === 'positive') { $svo[$svo_i]['positive'][] = true; }
+			// Count negative
+			if ($text_data[$f_i][0]->part === 'negative') { $svo[$svo_i]['negative'][] = true; }
+			// If amount, set amount as many
+			if ($text_data[$f_i][0]->part === 'amount') { $svo[$svo_i]['amount'] = 'many'; }
+			// Exclamation off for now
+			$svo[$svo_i]['exclamation'] = false;
+
+			// if ($svo_complete)
+			// {
+				// Find if relationship is truth
+				$truth = count($svo[$svo_i]['negative']) > 0 ? false : TRUE;
+				// Find sentiment of relationship
+				$sentiment = count($svo[$svo_i]['cheer']) - count($svo[$svo_i]['cheer']);
+			// }
+		}
 
 		// 
 		// Gather information and prep sentence
 		// 
 
-		// Determine if positive or negative connontation
-		// Currently does not account for double negatives
-		$is_true = count(array_keys($text_structure, 'negative')) > 0 ? false : TRUE;
-		$not_true = $is_true ? false : TRUE;
+		// Debug
+		// var_dump($svo);
+		echo 'type_of_sentence: ' . $type_of_sentence . '<br>';
+		echo 'truth: ' . $truth . '<br>';
+		echo 'sentiment: ' . $sentiment . '<br>';
 
+/*
 		// 
 		// Get agent action object
 		// 
@@ -203,10 +267,13 @@ class InterfaceController extends Controller {
 				$association_type[] = $text_data[$connection_i][0]->part;
 			}
 		}
+*/
 
+/*
 		// 
 		// Get connection from DB, Insert if not found, increase weight if found
 		// 
+		
 		if ($agent_key != 0 && $action_key != 0)
 		{
 			$current_connection = $text_data[] = DB::select('select * from `connections` 
@@ -334,11 +401,21 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
+*/
+
+		// 
+		// 
+		// Response
+		// 
+		// 
+
+		$computer_response = '';
 
 		// 
 		// Find related connections
 		// 
 
+/*
 		$agent_key = $agent_key === 0 ? 999999999 : $agent_key;
 		$action_key = $action_key === 0 ? 999999999 : $action_key;
 		$object_key = $object_key === 0 ? 999999999 : $object_key;
@@ -518,7 +595,7 @@ class InterfaceController extends Controller {
 				}
 			}
 		}
-
+*/
 		// If nothing is returned, stay silent
 		if ($computer_response === '') { $computer_response = '...'; }
 
