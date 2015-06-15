@@ -26,8 +26,8 @@
 								<small>;Steve ;Paris ;water ;people ;time</small>
 							</div>
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> ; </strong>Pronouns (Only these 4)</p>
-								<small>;I ;me ;you ;my</small>
+								<p><strong class="part_symbol"> : </strong>Pronouns (Only these 4)</p>
+								<small>:I :me :you :my</small>
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> # </strong>Action Verbs </p>
@@ -44,8 +44,8 @@
 						</div>
 						<div class="col-md-4">
 							<div class="explain_bubble">
-								<p><strong class="part_symbol"> $ </strong>Articles (There's only 3)</p>
-								<small>$the $a $an</small>
+								<p><strong class="part_symbol"> ` </strong>Articles (There's only 3)</p>
+								<small>`the `a `an</small>
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> ? </strong>Inquiry </p>
@@ -53,7 +53,7 @@
 							</div>
 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> @ </strong>Prepositions</p>
-								<small>@at @on $with $like</small>
+								<small>@at @on @with @like</small>
 							</div>
 							<div class="explain_bubble">
 								<strong class="part_symbol"> + </strong>or<strong> - </strong><p>Cheers and Jeers </p>

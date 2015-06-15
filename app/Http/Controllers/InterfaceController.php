@@ -19,6 +19,9 @@ class InterfaceController extends Controller {
 
 	public function speak()
 	{
+		// Get DB connection
+		$pdo = DB::connection('mysql')->getPdo();
+
 		// 
 		// Store data
 		// 
@@ -39,29 +42,29 @@ class InterfaceController extends Controller {
 		// Articles, Perspective because it communicates redundent information
 		// 
 
-		$text_input = str_replace('$a ', '', $text_input);
-		$text_input = str_replace('$A ', '', $text_input);
-		$text_input = str_replace('$an ', '', $text_input);
-		$text_input = str_replace('$An ', '', $text_input);
-		$text_input = str_replace('$the ', '', $text_input);
-		$text_input = str_replace('$The ', '', $text_input);
+		$text_input = str_replace('`a ', '', $text_input);
+		$text_input = str_replace('`A ', '', $text_input);
+		$text_input = str_replace('`an ', '', $text_input);
+		$text_input = str_replace('`An ', '', $text_input);
+		$text_input = str_replace('`the ', '', $text_input);
+		$text_input = str_replace('`The ', '', $text_input);
 		$text_input = str_replace('|s', '', $text_input);
 		$text_input = str_replace('\s', ' \possesses', $text_input);
-		$text_input = str_replace('/s', '/amount', $text_input);
+		$text_input = str_replace('/s', ' /amount', $text_input);
 
 		// 
 		// Translate pronouns
 		// 
 
-		$text_input = str_replace(';i', ';' . $start, $text_input);
-		$text_input = str_replace(';I', ';' . $start, $text_input);
-		$text_input = str_replace(';me', ';' . $start, $text_input);
-		$text_input = str_replace(';Me', ';' . $start, $text_input);
-		$text_input = str_replace(';my', ';' . $start, $text_input);
-		$text_input = str_replace(';My', ';' . $start, $text_input);
-		$text_input = str_replace(';you', ';Steve', $text_input);
-		$text_input = str_replace(';You', ';Steve', $text_input);
-		$text_input = str_replace(';steve', ';Steve', $text_input);
+		$text_input = str_replace(':i', ';' . $start, $text_input);
+		$text_input = str_replace(':I', ';' . $start, $text_input);
+		$text_input = str_replace(':me', ';' . $start, $text_input);
+		$text_input = str_replace(':Me', ';' . $start, $text_input);
+		$text_input = str_replace(':my', ';' . $start, $text_input);
+		$text_input = str_replace(':My', ';' . $start, $text_input);
+		$text_input = str_replace(':you', ';Steve', $text_input);
+		$text_input = str_replace(':You', ';Steve', $text_input);
+		$text_input = str_replace(':steve', ';Steve', $text_input);
 
 		// 
 		// Translate contractions
@@ -72,6 +75,7 @@ class InterfaceController extends Controller {
 		// 
 		// Seperate sentence into parts of speech
 		// 
+
 		preg_match_all('/;[\S]+/', $text_input, $noun);
 		preg_match_all('/#[\S]+/', $text_input, $action);
 		preg_match_all('/=[\S]+/', $text_input, $equate);
@@ -99,7 +103,7 @@ class InterfaceController extends Controller {
 		$type_of_sentence = 'declarative';
 
 		// Check to see if sentence is exclamatory
-		if (count($cheer) + count($jeer) >= $number_of_words / 2 ) { $type_of_sentence = 'exclamatory'; }
+		if (count($cheer) + count($jeer) === 3 ) { $type_of_sentence = 'exclamatory'; }
 
 		$text_structure = [];
 		foreach ($words as $text)
@@ -121,7 +125,7 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $inquiry[0]) ) { $part = $text_structure[] = 'inquiry'; }
 			else if (in_array($text, $possesses[0]) ) { $part = $text_structure[] = 'possesses'; }
 			else if (in_array($text, $amount[0]) ) { $part = $text_structure[] = 'amount'; }
-			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; }
+			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; die(); }
 
 			// Find is sentence is interrogative
 			if (in_array('inquiry', $text_structure) ) { $type_of_sentence = 'interrogative'; }
@@ -156,79 +160,175 @@ class InterfaceController extends Controller {
 
 		}
 
-		// debug
-
 		// 
 		// 
 		// Find and store subject verb object relationships
 		// 
 		// 
 
-		$svo = '';
-		$svo_complete = false;
-		$svo_i = 0;
-		$svo[$svo_i]['subject_type'] = 'word';
-		$svo[$svo_i]['object_type'] = 'word';
-		$svo[$svo_i]['amount'] = 'unknown';
-		$svo[$svo_i]['negative'] = '';
-		$svo[$svo_i]['positive'] = '';
-		$svo[$svo_i]['cheer'] = '';
-		$svo[$svo_i]['jeer'] = '';
-		for($f_i=0; $f_i<$number_of_words; $f_i++) 
+		// Only for sentences with information
+		// if ($type_of_sentence === 'declarative' || $type_of_sentence === 'exclamatory')
+		if ($type_of_sentence === 'fish')
 		{
-			// subject if noun and subject isn't set
-			if ($text_data[$f_i][0]->part === 'noun' && ! isset($svo[$svo_i]['subject']) ) { $svo[$svo_i]['subject'] = $text_data[$f_i][0]->id; }
-			// possesses true if possesses
-			if ($text_data[$f_i][0]->part === 'possesses') { $svo[$svo_i]['possesses'] = true; }
-			// subject replaced if noun and possesses exists
-			if ($text_data[$f_i][0]->part === 'noun' && isset($svo[$svo_i]['possesses']) ) { $svo[$svo_i]['subject'] = $text_data[$f_i][0]->id; }
-			// action adjective if adjective and verb
-			if ($text_data[$f_i][0]->part === 'adjective' && isset($svo[$svo_i]['verb']) ) { $svo[$svo_i]['action_adjective'] = $text_data[$f_i][0]->id; }
-			// action if action and action isn't set
-			if ($text_data[$f_i][0]->part === 'action' && ! isset($svo[$svo_i]['action']) ) { $svo[$svo_i]['action'] = $text_data[$f_i][0]->id; }
-			// adverb if verb and action is already set
-			if ($text_data[$f_i][0]->part === 'action' && isset($svo[$svo_i]['action']) ) { $svo[$svo_i]['adverb'] = $text_data[$f_i][0]->id; }
-			// infinitive if action and adverb is already set
-			if ($text_data[$f_i][0]->part === 'action' && isset($svo[$svo_i]['adverb']) ) { $svo[$svo_i]['infinitive'] = $text_data[$f_i][0]->id; }
-			// object adjective if adjective and action is set
-			if ($text_data[$f_i][0]->part === 'adjective' && isset($svo[$svo_i]['action']) ) { $svo[$svo_i]['object_adjective'] = $text_data[$f_i][0]->id; }
-			// object if noun and object not set
-			if ($text_data[$f_i][0]->part === 'noun' && isset($svo[$svo_i]['object']) ) { $svo[$svo_i]['object'] = $text_data[$f_i][0]->id; }
-			// preposition if preposition
-			if ($text_data[$f_i][0]->part === 'preposition') { $svo[$svo_i]['preposition'] = $text_data[$f_i][0]->id; }
-			// equate if equate
-			if ($text_data[$f_i][0]->part === 'equate') { $svo[$svo_i]['equate'] = true; }
-			// Count cheer
-			if ($text_data[$f_i][0]->part === 'cheer') { $svo[$svo_i]['cheer'][] = true; }
-			// Count jeer
-			if ($text_data[$f_i][0]->part === 'jeer') { $svo[$svo_i]['jeer'][] = true; }
-			// Count positive
-			if ($text_data[$f_i][0]->part === 'positive') { $svo[$svo_i]['positive'][] = true; }
-			// Count negative
-			if ($text_data[$f_i][0]->part === 'negative') { $svo[$svo_i]['negative'][] = true; }
-			// If amount, set amount as many
-			if ($text_data[$f_i][0]->part === 'amount') { $svo[$svo_i]['amount'] = 'many'; }
-			// Exclamation off for now
+			// Set initial defaults
+			$svo = [];
+			$svo_i = 0;
+			$last_id = 0;
+			// Set iteration defaults
 			$svo[$svo_i]['exclamation'] = false;
+			$svo[$svo_i]['preceding'] = $svo[$svo_i]['subject_amount'] = $svo[$svo_i]['object_amount'] = 'unknown';
+			$svo[$svo_i]['negative'] = $svo[$svo_i]['positive'] = $svo[$svo_i]['cheer'] = $svo[$svo_i]['jeer'] = $svo[$svo_i]['possesses'] = 
+				$svo[$svo_i]['subject'] = $svo[$svo_i]['object'] = $svo[$svo_i]['action'] = $svo[$svo_i]['action_adjective'] = $svo[$svo_i]['infinitive'] = 
+				$svo[$svo_i]['adverb'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
+			$svo[$svo_i]['equate'] = false;
+			$svo[$svo_i]['truth'] = true;
+			$svo[$svo_i]['sentiment'] = 0;
+			for($f_i=0; $f_i<$number_of_words; $f_i++) 
+			{
+				// Debug
+				echo $text_data[$f_i][0]->word;
+				// Used for checking what's next in the loop
+				$t_i = $f_i + 1;
+				// object if noun and object not set, comparison must be done before subject
+				if ($text_data[$f_i][0]->part === 'noun' && $svo[$svo_i]['subject'] != '' ) { 
+					$svo[$svo_i]['object'] = $text_data[$f_i][0]->id; 
+					// Find if object is plural by jumping ahead, and be sure to do check if isset first
+					if (isset($text_data[$t_i][0]->part) && $text_data[$t_i][0]->part === 'amount') { 
+						echo '<br>' . $text_data[$t_i][0]->word;
+						$svo[$svo_i]['object_amount'] = 'many'; 
+					}
+				}
+				// subject if noun and subject isn't set
+				if ($text_data[$f_i][0]->part === 'noun' && ! $svo[$svo_i]['subject'] != '' ) { $svo[$svo_i]['subject'] = $text_data[$f_i][0]->id; }
+				// possesses true if possesses
+				if ($text_data[$f_i][0]->part === 'possesses') { $svo[$svo_i]['possesses'] = true; }
+				// action adjective if adjective and verb
+				if ($text_data[$f_i][0]->part === 'adjective' && $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['action_adjective'] = $text_data[$f_i][0]->id; }
+				// infinitive if action and adverb is already set
+				if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['adverb'] != '' ) { $svo[$svo_i]['infinitive'] = $text_data[$f_i][0]->id; }
+				// adverb if verb and action is already set
+				if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['adverb'] = $text_data[$f_i][0]->id; }
+				// action if action and action isn't set
+				if ($text_data[$f_i][0]->part === 'action' && ! $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['action'] = $text_data[$f_i][0]->id; }
+				// object adjective if adjective and action is set
+				if ($text_data[$f_i][0]->part === 'adjective' && ($svo[$svo_i]['action'] != '' || $svo[$svo_i]['equate'] != '') ) { 
+					$svo[$svo_i]['object_adjective'] = $text_data[$f_i][0]->id; 
+				}
+				// preposition if preposition
+				if ($text_data[$f_i][0]->part === 'preposition') { $svo[$svo_i]['preposition'] = $text_data[$f_i][0]->id; }
+				// equate if equate
+				if ($text_data[$f_i][0]->part === 'equate') { $svo[$svo_i]['equate'] = true; }
+				// Count cheer
+				if ($text_data[$f_i][0]->part === 'cheer') { $svo[$svo_i]['cheer'][] = true; $svo[$svo_i]['exclamation'][] = $text_data[$f_i][0]->id; }
+				// Count jeer
+				if ($text_data[$f_i][0]->part === 'jeer') { $svo[$svo_i]['jeer'][] = true; $svo[$svo_i]['exclamation'][] = $text_data[$f_i][0]->id; }
+				// Count positive
+				if ($text_data[$f_i][0]->part === 'positive') { $svo[$svo_i]['positive'][] = true; }
+				// Count negative
+				if ($text_data[$f_i][0]->part === 'negative') { $svo[$svo_i]['negative'][] = true; }
+				// If amount, set subject_amount as many
+				if ($text_data[$f_i][0]->part === 'amount') { $svo[$svo_i]['subject_amount'] = 'many'; }
 
-			// if ($svo_complete)
-			// {
-				// Find if relationship is truth
-				$truth = count($svo[$svo_i]['negative']) > 0 ? false : TRUE;
-				// Find sentiment of relationship
-				$sentiment = count($svo[$svo_i]['cheer']) - count($svo[$svo_i]['cheer']);
-			// }
+				// debug
+				var_dump($svo[$svo_i]);
+
+				// If object found, or this is last loop, Subject verb object relationship complete
+				if ($svo[$svo_i]['object'] != '' || $f_i === $number_of_words - 1)
+				{
+					echo 'Relationship established. Start again<br>';
+					// Find if relationship is truth
+					$svo[$svo_i]['truth'] = count($svo[$svo_i]['negative']) > 0 ? false : TRUE;
+					// Find sentiment of relationship
+					$svo[$svo_i]['sentiment'] = count($svo[$svo_i]['cheer']) - count($svo[$svo_i]['cheer']);
+
+					// 
+					// Insert into database
+					// 
+
+					DB::insert('insert into `relationships` (preceding, truth, sentiment, exclamation, subject, subject_amount, action_adjective, 
+						possesses, adverb, infinitive, action, preposition, object_adjective, equate, object, object_amount) 
+						values (:preceding, :truth, :sentiment, :exclamation, :subject, :subject_amount, :action_adjective,
+							:possesses, :adverb, :infinitive, :action, :preposition, :object_adjective, :equate, :object, :object_amount)', 
+						['preceding' => $last_id, 'truth' => $svo[$svo_i]['truth'], 'sentiment' => $svo[$svo_i]['sentiment'], 
+						'exclamation' => $svo[$svo_i]['exclamation'], 'subject' => $svo[$svo_i]['subject'], 'subject_amount' => $svo[$svo_i]['subject_amount'], 
+						'action_adjective' => $svo[$svo_i]['action_adjective'], 'possesses' => $svo[$svo_i]['possesses'], 'adverb' => $svo[$svo_i]['adverb'],
+						'infinitive' => $svo[$svo_i]['infinitive'], 'action' => $svo[$svo_i]['action'], 'preposition' => $svo[$svo_i]['preposition'], 
+						'object_adjective' => $svo[$svo_i]['object_adjective'], 'equate' => $svo[$svo_i]['equate'], 'object' => $svo[$svo_i]['object'], 
+						'object_amount' => $svo[$svo_i]['object_amount']]);
+					$last_id = $pdo->lastInsertId();
+
+					// increment to the next one
+					$svo_i++;
+					// Set defaults
+					$svo[$svo_i]['exclamation'] = false;
+					$svo[$svo_i]['preceding'] = $svo[$svo_i]['subject_amount'] = $svo[$svo_i]['object_amount'] = 'unknown';
+					$svo[$svo_i]['negative'] = $svo[$svo_i]['positive'] = $svo[$svo_i]['cheer'] = $svo[$svo_i]['jeer'] = $svo[$svo_i]['possesses'] = 
+						$svo[$svo_i]['subject'] = $svo[$svo_i]['object'] = $svo[$svo_i]['action'] = $svo[$svo_i]['action_adjective'] = $svo[$svo_i]['infinitive'] = 
+						$svo[$svo_i]['adverb'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
+					$svo[$svo_i]['equate'] = false;
+					$svo[$svo_i]['truth'] = true;
+					$svo[$svo_i]['sentiment'] = 0;
+					// Reduce for loop pointer so that current object will be next subject
+					if ($f_i != $number_of_words - 1) { $f_i--; }
+
+					// Debug
+					$smaller_svo = $svo_i - 1;
+					echo 'End state of relationship';
+					var_dump($svo[$smaller_svo]);
+					echo 'New relationship<br>';
+
+				}
+			}
 		}
 
 		// 
-		// Gather information and prep sentence
+		// 
+		// Response
+		// 
 		// 
 
-		// Debug
-		// var_dump($svo);
-		echo 'type_of_sentence: ' . $type_of_sentence . '<br>';
-		echo 'truth: ' . $truth . '<br>';
-		echo 'sentiment: ' . $sentiment . '<br>';
+		$computer_response = '';
+
+		// 
+		// Declarative response
+		// 
+
+		if ($type_of_sentence === 'declarative')
+		{
+			$computer_response = 'Whatever';
+			// $example = DB::select('SELECT word as word from words w
+			// 						LEFT JOIN
+			// 						    relationships r on w.id = r.object
+			// 						WHERE r.object in (321)
+			// 						OR r.subject in (321)');
+		}
+
+		// 
+		// Interrogative response
+		// 
+
+		else if ($type_of_sentence === 'interrogative')
+		{
+			$computer_response = 'I don\'t know';
+		}
+
+		// 
+		// Exclamatory response
+		// 
+
+		else if ($type_of_sentence === 'exclamatory')
+		{
+			$computer_response = 'You\'re boring me';
+		}
+
+		// 
+		// Imperative response
+		// 
+
+		else if ($type_of_sentence === 'imperative')
+		{
+			$computer_response = 'Don\'t wanna';
+		}
 
 /*
 		// 
@@ -346,19 +446,19 @@ class InterfaceController extends Controller {
 					$a_key = $text_data[$outer_relationship_i][0]->id;
 					$b_key = $text_data[$inner_relationship_i][0]->id;
 					// Find existing relationship
-					$relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $a_key, 'b_key' => $b_key]);
+					$relationship = DB::select('select * from `old_relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $a_key, 'b_key' => $b_key]);
 					// Create relationship if not found
 					if (empty($relationship) )
 					{
-						DB::insert('insert into `relationships` (a_key, b_key, is_true, not_true) values (:a_key, :b_key, :is_true, :not_true)', 
+						DB::insert('insert into `old_relationships` (a_key, b_key, is_true, not_true) values (:a_key, :b_key, :is_true, :not_true)', 
 							['a_key' => $a_key, 'b_key' => $b_key, 'is_true' => $is_true, 'not_true' => $not_true]);
-						$relationship = DB::select('select * from `relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $a_key, 'b_key' => $b_key]);
+						$relationship = DB::select('select * from `old_relationships` where a_key = :a_key and b_key = :b_key', ['a_key' => $a_key, 'b_key' => $b_key]);
 					}
 					// Update truthiness
 					else
 					{
-						if ($is_true) { DB::update('update `relationships` set is_true = is_true + 1 where id = :id', ['id' => $relationship[0]->id]); }
-						else { DB::update('update `relationships` set not_true = not_true + 1 where id = :id', ['id' => $relationship[0]->id]); }
+						if ($is_true) { DB::update('update `old_relationships` set is_true = is_true + 1 where id = :id', ['id' => $relationship[0]->id]); }
+						else { DB::update('update `old_relationships` set not_true = not_true + 1 where id = :id', ['id' => $relationship[0]->id]); }
 					}
 					// Context
 					$context_array[] = $relationship[0]->id;
@@ -402,14 +502,6 @@ class InterfaceController extends Controller {
 			}
 		}
 */
-
-		// 
-		// 
-		// Response
-		// 
-		// 
-
-		$computer_response = '';
 
 		// 
 		// Find related connections
@@ -532,7 +624,7 @@ class InterfaceController extends Controller {
 				  w_2.word as word_2, w_2.part as part_2, w_2.weight as weight_2
 				FROM
 				    contexts c
-				    LEFT JOIN relationships r_1 ON r_1.id = c.x_key
+				    LEFT JOIN old_relationships r_1 ON r_1.id = c.x_key
 				    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
 				    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
 				WHERE
@@ -554,7 +646,7 @@ class InterfaceController extends Controller {
 				  w_2.word as word_4, w_2.part as part_4, w_2.weight as weight_4
 				FROM
 				    contexts c
-				    LEFT JOIN relationships r_1 ON r_1.id = c.y_key
+				    LEFT JOIN old_relationships r_1 ON r_1.id = c.y_key
 				    LEFT JOIN words w_1 ON w_1.id = r_1.a_key
 				    LEFT JOIN words w_2 ON w_2.id = r_1.b_key
 				WHERE
