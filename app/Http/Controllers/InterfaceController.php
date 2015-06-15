@@ -125,7 +125,7 @@ class InterfaceController extends Controller {
 			else if (in_array($text, $inquiry[0]) ) { $part = $text_structure[] = 'inquiry'; }
 			else if (in_array($text, $possesses[0]) ) { $part = $text_structure[] = 'possesses'; }
 			else if (in_array($text, $amount[0]) ) { $part = $text_structure[] = 'amount'; }
-			else { $part = ''; $error = 'Does Not Computer: "' . $text . '" is not delimited'; die(); }
+			else { return 'Does Not Computer: "' . $text . '" is not delimited correctly'; }
 
 			// Find is sentence is interrogative
 			if (in_array('inquiry', $text_structure) ) { $type_of_sentence = 'interrogative'; }
@@ -167,8 +167,7 @@ class InterfaceController extends Controller {
 		// 
 
 		// Only for sentences with information
-		// if ($type_of_sentence === 'declarative' || $type_of_sentence === 'exclamatory')
-		if ($type_of_sentence === 'fish')
+		if ($type_of_sentence === 'declarative' || $type_of_sentence === 'exclamatory')
 		{
 			// Set initial defaults
 			$svo = [];
@@ -186,7 +185,8 @@ class InterfaceController extends Controller {
 			for($f_i=0; $f_i<$number_of_words; $f_i++) 
 			{
 				// Debug
-				echo $text_data[$f_i][0]->word;
+				// echo $text_data[$f_i][0]->word;
+
 				// Used for checking what's next in the loop
 				$t_i = $f_i + 1;
 				// object if noun and object not set, comparison must be done before subject
@@ -194,7 +194,6 @@ class InterfaceController extends Controller {
 					$svo[$svo_i]['object'] = $text_data[$f_i][0]->id; 
 					// Find if object is plural by jumping ahead, and be sure to do check if isset first
 					if (isset($text_data[$t_i][0]->part) && $text_data[$t_i][0]->part === 'amount') { 
-						echo '<br>' . $text_data[$t_i][0]->word;
 						$svo[$svo_i]['object_amount'] = 'many'; 
 					}
 				}
@@ -219,25 +218,27 @@ class InterfaceController extends Controller {
 				// equate if equate
 				if ($text_data[$f_i][0]->part === 'equate') { $svo[$svo_i]['equate'] = true; }
 				// Count cheer
-				if ($text_data[$f_i][0]->part === 'cheer') { $svo[$svo_i]['cheer'][] = true; $svo[$svo_i]['exclamation'][] = $text_data[$f_i][0]->id; }
+				if ($text_data[$f_i][0]->part === 'cheer') { $svo[$svo_i]['cheer'][] = true; $svo[$svo_i]['exclamation'] = $text_data[$f_i][0]->id; }
 				// Count jeer
-				if ($text_data[$f_i][0]->part === 'jeer') { $svo[$svo_i]['jeer'][] = true; $svo[$svo_i]['exclamation'][] = $text_data[$f_i][0]->id; }
+				if ($text_data[$f_i][0]->part === 'jeer') { $svo[$svo_i]['jeer'][] = true; $svo[$svo_i]['exclamation'] = $text_data[$f_i][0]->id; }
 				// Count positive
-				if ($text_data[$f_i][0]->part === 'positive') { $svo[$svo_i]['positive'][] = true; }
+				if ($text_data[$f_i][0]->part === 'positive') { $svo[$svo_i]['positive'] = true; }
 				// Count negative
-				if ($text_data[$f_i][0]->part === 'negative') { $svo[$svo_i]['negative'][] = true; }
+				if ($text_data[$f_i][0]->part === 'negative') { $svo[$svo_i]['negative'] = true; }
 				// If amount, set subject_amount as many
 				if ($text_data[$f_i][0]->part === 'amount') { $svo[$svo_i]['subject_amount'] = 'many'; }
 
 				// debug
-				var_dump($svo[$svo_i]);
+				// var_dump($svo[$svo_i]);
 
 				// If object found, or this is last loop, Subject verb object relationship complete
 				if ($svo[$svo_i]['object'] != '' || $f_i === $number_of_words - 1)
 				{
-					echo 'Relationship established. Start again<br>';
+					// Debug
+					// echo 'Relationship established. Start again<br>';
+
 					// Find if relationship is truth
-					$svo[$svo_i]['truth'] = count($svo[$svo_i]['negative']) > 0 ? false : TRUE;
+					$svo[$svo_i]['truth'] = count($svo[$svo_i]['negative']) > 1 ? false : TRUE;
 					// Find sentiment of relationship
 					$svo[$svo_i]['sentiment'] = count($svo[$svo_i]['cheer']) - count($svo[$svo_i]['cheer']);
 
@@ -272,10 +273,10 @@ class InterfaceController extends Controller {
 					if ($f_i != $number_of_words - 1) { $f_i--; }
 
 					// Debug
-					$smaller_svo = $svo_i - 1;
-					echo 'End state of relationship';
-					var_dump($svo[$smaller_svo]);
-					echo 'New relationship<br>';
+					// $smaller_svo = $svo_i - 1;
+					// echo 'End state of relationship';
+					// var_dump($svo[$smaller_svo]);
+					// echo 'New relationship<br>';
 
 				}
 			}
@@ -295,12 +296,41 @@ class InterfaceController extends Controller {
 
 		if ($type_of_sentence === 'declarative')
 		{
+			// Construct in string
+			$in_query_string = '';
+			foreach ($text_data as $text_data_iteration) 
+			{
+				if ($text_data_iteration[0]->part === 'noun')
+				{
+					$in_query_string .= $text_data_iteration[0]->id . ',';
+				}
+			}
+			$in_query_string = rtrim($in_query_string, ',');
+
+			// Get relevant relationships without preceding
+			$relevant = DB::select('SELECT * 
+									FROM relationships 
+									WHERE preceding = 0
+									AND (
+										subject IN (' . $in_query_string . ')
+										OR object IN (' . $in_query_string . ') 
+									)
+									ORDER BY created DESC');
+			// Get preceding
+			$preceding_id = $relevant[0]->id;
+			while ($preceding_id != 0)
+			{
+				$following[] = DB::select('SELECT * 
+										FROM relationships 
+										WHERE preceding = :preceding', 
+										['preceding' => $preceding_id]);
+				$preceding_id = isset($following[0]->id) ? $following[0]->id : 0;
+			}
+
+			var_dump($relevant[0]);
+			var_dump($following);
+
 			$computer_response = 'Whatever';
-			// $example = DB::select('SELECT word as word from words w
-			// 						LEFT JOIN
-			// 						    relationships r on w.id = r.object
-			// 						WHERE r.object in (321)
-			// 						OR r.subject in (321)');
 		}
 
 		// 
