@@ -39,7 +39,7 @@ class InterfaceController extends Controller {
 		$error = (strlen($text_input) > 200) ? 'Does Not Computer: Too many characters' : false;
 
 		// 
-		// Articles, Perspective because it communicates redundent information
+		// Articles, Perspectives removed because it communicates redundent information
 		// 
 
 		$text_input = str_replace('`a ', '', $text_input);
@@ -51,6 +51,35 @@ class InterfaceController extends Controller {
 		$text_input = str_replace('|s', '', $text_input);
 		$text_input = str_replace('\s', ' \possesses', $text_input);
 		$text_input = str_replace('/s', ' /amount', $text_input);
+
+		// 
+		// Possesses
+		// 
+
+		$text_input = str_replace('#get ', '\possesses ', $text_input);
+		$text_input = str_replace('#got ', '\possesses ', $text_input);
+		$text_input = str_replace('#given ', '\possesses ', $text_input);
+		$text_input = str_replace('#has ', '\possesses ', $text_input);
+		$text_input = str_replace('#had ', '\possesses ', $text_input);
+		$text_input = str_replace('#have ', '\possesses ', $text_input);
+		$text_input = str_replace('#own ', '\possesses ', $text_input);
+		$text_input = str_replace('#owned ', '\possesses ', $text_input);
+		$text_input = str_replace('#posesses ', '\possesses ', $text_input);
+		$text_input = str_replace('#receive ', '\possesses ', $text_input);
+		$text_input = str_replace('#keep ', '\possesses ', $text_input);
+		$text_input = str_replace('#take ', '\possesses ', $text_input);
+		$text_input = str_replace('#toke ', '\possesses ', $text_input);
+
+		// 
+		// Contractions
+		// 
+
+		$text_input = str_replace('\'t ', '--not ', $text_input);
+		$text_input = str_replace('n\'t ', '--not ', $text_input);
+		$text_input = str_replace('\'d ', '#would ', $text_input);
+		$text_input = str_replace('\'s ', '=is ', $text_input);
+		$text_input = str_replace('\'ll ', '#will ', $text_input);
+		$text_input = str_replace('\'ve ', '\possesses ', $text_input);
 
 		// 
 		// Translate pronouns
@@ -103,7 +132,7 @@ class InterfaceController extends Controller {
 		$type_of_sentence = 'declarative';
 
 		// Check to see if sentence is exclamatory
-		if (count($cheer) + count($jeer) === 3 ) { $type_of_sentence = 'exclamatory'; }
+		if (count($cheer) + count($jeer) === 3) { $type_of_sentence = 'exclamatory'; }
 
 		$text_structure = [];
 		foreach ($words as $text)
@@ -159,6 +188,7 @@ class InterfaceController extends Controller {
 			}
 
 		}
+		if (count($noun) > 1) { $type_of_sentence = 'exclamatory'; }
 
 		// 
 		// 
@@ -178,7 +208,7 @@ class InterfaceController extends Controller {
 			$svo[$svo_i]['preceding'] = $svo[$svo_i]['subject_amount'] = $svo[$svo_i]['object_amount'] = 'unknown';
 			$svo[$svo_i]['negative'] = $svo[$svo_i]['positive'] = $svo[$svo_i]['cheer'] = $svo[$svo_i]['jeer'] = $svo[$svo_i]['possesses'] = 
 				$svo[$svo_i]['subject'] = $svo[$svo_i]['object'] = $svo[$svo_i]['action'] = $svo[$svo_i]['action_adjective'] = $svo[$svo_i]['infinitive'] = 
-				$svo[$svo_i]['adverb'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
+				$svo[$svo_i]['adverb'] = $svo[$svo_i]['subject_adjective'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
 			$svo[$svo_i]['equate'] = false;
 			$svo[$svo_i]['truth'] = true;
 			$svo[$svo_i]['sentiment'] = 0;
@@ -212,7 +242,7 @@ class InterfaceController extends Controller {
 				// action if action and action isn't set
 				if ($text_data[$f_i][0]->part === 'action' && ! $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['action'] = $text_data[$f_i][0]->id; }
 				// object adjective if adjective and action is set
-				if ($text_data[$f_i][0]->part === 'adjective' && ($svo[$svo_i]['action'] != '' || $svo[$svo_i]['equate'] != '') ) { 
+				if ($text_data[$f_i][0]->part === 'adjective' && $svo[$svo_i]['action_adjective'] === '' ) { 
 					$svo[$svo_i]['object_adjective'] = $text_data[$f_i][0]->id; 
 				}
 				// preposition if preposition
@@ -240,7 +270,7 @@ class InterfaceController extends Controller {
 					// echo 'Relationship established. Start again<br>';
 
 					// Find if relationship is truth
-					$svo[$svo_i]['truth'] = count($svo[$svo_i]['negative']) > 1 ? false : TRUE;
+					$svo[$svo_i]['truth'] = count($svo[$svo_i]['negative']) >= 1 ? false : TRUE;
 					// Find sentiment of relationship
 					$svo[$svo_i]['sentiment'] = count($svo[$svo_i]['cheer']) - count($svo[$svo_i]['cheer']);
 
@@ -267,7 +297,7 @@ class InterfaceController extends Controller {
 					$svo[$svo_i]['preceding'] = $svo[$svo_i]['subject_amount'] = $svo[$svo_i]['object_amount'] = 'unknown';
 					$svo[$svo_i]['negative'] = $svo[$svo_i]['positive'] = $svo[$svo_i]['cheer'] = $svo[$svo_i]['jeer'] = $svo[$svo_i]['possesses'] = 
 						$svo[$svo_i]['subject'] = $svo[$svo_i]['object'] = $svo[$svo_i]['action'] = $svo[$svo_i]['action_adjective'] = $svo[$svo_i]['infinitive'] = 
-						$svo[$svo_i]['adverb'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
+						$svo[$svo_i]['adverb'] = $svo[$svo_i]['subject_adjective'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
 					$svo[$svo_i]['equate'] = false;
 					$svo[$svo_i]['truth'] = true;
 					$svo[$svo_i]['sentiment'] = 0;
@@ -309,6 +339,8 @@ class InterfaceController extends Controller {
 			}
 			$in_query_string = rtrim($in_query_string, ',');
 
+			if ($in_query_string === '') { return '...'; }
+
 			// Get relevant relationships without preceding
 			$relevant = DB::select('SELECT * 
 									FROM relationships 
@@ -320,6 +352,7 @@ class InterfaceController extends Controller {
 									ORDER BY RAND()');
 			// Get preceding
 			$preceding_id = $relevant[0]->id;
+			$following = [];
 			while ($preceding_id != 0)
 			{
 				$following[] = DB::select('SELECT * 
@@ -353,7 +386,8 @@ class InterfaceController extends Controller {
 				if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
 				else { $computer_response .= '=is'; }
 			}
-			$computer_response .= get_word($relevant[0]->possesses) ? '\\s ' : '';
+			$computer_response .= get_word($relevant[0]->truth) ? '' : '--not ';
+			$computer_response .= get_word($relevant[0]->possesses) ? '#has ' : '';
 			$computer_response .= get_word($relevant[0]->action_adjective) . ' ';
 			$computer_response .= get_word($relevant[0]->adverb) . ' ';
 			$computer_response .= get_word($relevant[0]->infinitive) . ' ';
@@ -362,6 +396,31 @@ class InterfaceController extends Controller {
 			$computer_response .= get_word($relevant[0]->preposition) . ' ';
 			$computer_response .= get_word($relevant[0]->object) . ' ';
 			$computer_response .= get_word($relevant[0]->object_amount) ? '/s' : ' ';
+
+			if (! empty($following[0]) )
+			{		
+				foreach ($following as $follow)
+				{
+					// $computer_response .= get_word($follow->subject) . ' ';
+					$computer_response .= get_word($follow[0]->subject_amount) ? '/s ' : '';
+					if (get_word($follow[0]->equate))
+					{
+						// Find amount equate is referring to
+						if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
+						else { $computer_response .= '=is'; }
+					}
+					$computer_response .= get_word($follow[0]->truth) ? '' : '--not ';
+					$computer_response .= get_word($follow[0]->possesses) ? '\\s ' : '';
+					$computer_response .= get_word($follow[0]->action_adjective) . ' ';
+					$computer_response .= get_word($follow[0]->adverb) . ' ';
+					$computer_response .= get_word($follow[0]->infinitive) . ' ';
+					$computer_response .= get_word($follow[0]->action) . ' ';
+					$computer_response .= get_word($follow[0]->object_adjective) . ' ';
+					$computer_response .= get_word($follow[0]->preposition) . ' ';
+					$computer_response .= get_word($follow[0]->object) . ' ';
+					$computer_response .= get_word($follow[0]->object_amount) ? '/s' : ' ';
+				}	
+			}
 
 			// $computer_response = 'Whatever';
 		}
@@ -392,6 +451,21 @@ class InterfaceController extends Controller {
 		{
 			$computer_response = ':I #can --not';
 		}
+
+
+		// Create pronouns
+		// Self at start of sentence creates grammar rules to be followed
+		if (strpos($computer_response, ';steve', 0) )
+		{		
+			// Replace start self reference with I instead of me
+			$computer_response = preg_replace('/^' . preg_quote(';steve', '/') . '/', ':I', $computer_response);
+		}
+		// Current User
+		$computer_response = str_replace(';' . $start, ':you', $computer_response);
+		// Past User
+		$computer_response = str_replace(';1433', ':user_', $computer_response);
+		// Self
+		$computer_response = str_replace(':steve', ':me', $computer_response);
 
 /*
 		// 
@@ -648,14 +722,6 @@ class InterfaceController extends Controller {
 			$next_word = DB::select("SELECT * FROM `words` where `id` = " . $current_id . " and `part` = '" . $current_part . "';");
 			$computer_response .= $next_word[0]->word . ' ';
 		}
-
-		// Create pronouns
-		// Self
-		$computer_response = str_replace(';steve', '.me', $computer_response);
-		// Current User
-		$computer_response = str_replace(';' . $start, 'you', $computer_response);
-		// Past User
-		$computer_response = str_replace(';1433', 'user_', $computer_response);
 
 		// 
 		// If no response, resort to relationships and contexts

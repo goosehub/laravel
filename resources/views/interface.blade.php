@@ -82,12 +82,8 @@
 								<small>want|s |give|s</small>
 							</div>
 							<div class="explain_bubble">
-								<p>Conjunctions are not yet possible </p>
+								<p>Conjunctions are not allowed </p>
 								<small>and but then</small>
-							</div>
-							<div class="explain_bubble">
-								<p>Contractions are not yet possible </p>
-								<small>don't it's isn't</small>
 							</div>
 <!-- 							<div class="explain_bubble">
 								<p><strong class="part_symbol"> < </strong>Past Tense</p>
