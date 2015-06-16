@@ -202,7 +202,9 @@ class InterfaceController extends Controller {
 				// possesses true if possesses
 				if ($text_data[$f_i][0]->part === 'possesses') { $svo[$svo_i]['possesses'] = true; }
 				// action adjective if adjective and verb
-				if ($text_data[$f_i][0]->part === 'adjective' && $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['action_adjective'] = $text_data[$f_i][0]->id; }
+				if ($text_data[$f_i][0]->part === 'adjective' && ($svo[$svo_i]['action'] === '' && $svo[$svo_i]['equate'] === '') ) { 
+					$svo[$svo_i]['action_adjective'] = $text_data[$f_i][0]->id; 
+				}
 				// infinitive if action and adverb is already set
 				if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['adverb'] != '' ) { $svo[$svo_i]['infinitive'] = $text_data[$f_i][0]->id; }
 				// adverb if verb and action is already set
@@ -315,7 +317,7 @@ class InterfaceController extends Controller {
 										subject IN (' . $in_query_string . ')
 										OR object IN (' . $in_query_string . ') 
 									)
-									ORDER BY created DESC');
+									ORDER BY RAND()');
 			// Get preceding
 			$preceding_id = $relevant[0]->id;
 			while ($preceding_id != 0)
@@ -327,10 +329,41 @@ class InterfaceController extends Controller {
 				$preceding_id = isset($following[0]->id) ? $following[0]->id : 0;
 			}
 
-			var_dump($relevant[0]);
-			var_dump($following);
+			// Debug
+			// var_dump($relevant[0]);
+			// var_dump($following);
 
-			$computer_response = 'Whatever';
+			function get_word($word)
+			{
+				if ($word === '1') { return true; }
+				else if ($word === '0') { return false; }
+				$result = DB::select('SELECT * 
+										FROM words 
+										WHERE id = :id', 
+										['id' => $word]);
+				if (empty($word) ) { return false; }
+				return $result[0]->word;
+			}
+
+			$computer_response .= get_word($relevant[0]->subject) . ' ';
+			$computer_response .= get_word($relevant[0]->subject_amount) ? '/s ' : '';
+			if (get_word($relevant[0]->equate))
+			{
+				// Find amount equate is referring to
+				if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
+				else { $computer_response .= '=is'; }
+			}
+			$computer_response .= get_word($relevant[0]->possesses) ? '\\s ' : '';
+			$computer_response .= get_word($relevant[0]->action_adjective) . ' ';
+			$computer_response .= get_word($relevant[0]->adverb) . ' ';
+			$computer_response .= get_word($relevant[0]->infinitive) . ' ';
+			$computer_response .= get_word($relevant[0]->action) . ' ';
+			$computer_response .= get_word($relevant[0]->object_adjective) . ' ';
+			$computer_response .= get_word($relevant[0]->preposition) . ' ';
+			$computer_response .= get_word($relevant[0]->object) . ' ';
+			$computer_response .= get_word($relevant[0]->object_amount) ? '/s' : ' ';
+
+			// $computer_response = 'Whatever';
 		}
 
 		// 
@@ -339,7 +372,7 @@ class InterfaceController extends Controller {
 
 		else if ($type_of_sentence === 'interrogative')
 		{
-			$computer_response = 'I don\'t know';
+			$computer_response = ':I #do --not #know';
 		}
 
 		// 
@@ -348,7 +381,7 @@ class InterfaceController extends Controller {
 
 		else if ($type_of_sentence === 'exclamatory')
 		{
-			$computer_response = 'You\'re boring me';
+			$computer_response = '#tell :me *more';
 		}
 
 		// 
@@ -357,7 +390,7 @@ class InterfaceController extends Controller {
 
 		else if ($type_of_sentence === 'imperative')
 		{
-			$computer_response = 'Don\'t wanna';
+			$computer_response = ':I #can --not';
 		}
 
 /*
