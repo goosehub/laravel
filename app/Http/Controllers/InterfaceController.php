@@ -236,12 +236,21 @@ class InterfaceController extends Controller {
 				if ($text_data[$f_i][0]->part === 'adjective' && ($svo[$svo_i]['action'] === '' && $svo[$svo_i]['equate'] === '') ) { 
 					$svo[$svo_i]['action_adjective'] = $text_data[$f_i][0]->id; 
 				}
-				// infinitive if action and adverb is already set
-				if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['adverb'] != '' ) { $svo[$svo_i]['infinitive'] = $text_data[$f_i][0]->id; }
-				// adverb if verb and action is already set
-				if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['adverb'] = $text_data[$f_i][0]->id; }
 				// action if action and action isn't set
-				if ($text_data[$f_i][0]->part === 'action' && ! $svo[$svo_i]['action'] != '' ) { $svo[$svo_i]['action'] = $text_data[$f_i][0]->id; }
+				if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['action'] === '' ) { 
+					$svo[$svo_i]['action'] = $text_data[$f_i][0]->id; 
+				}
+				// adverb if verb and action is already set
+				else if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['adverb'] === '' ) { 
+					$svo[$svo_i]['adverb'] = $svo[$svo_i]['action'];
+					$svo[$svo_i]['action'] = $text_data[$f_i][0]->id; 
+				}
+				// infinitive if action and adverb is already set
+				else if ($text_data[$f_i][0]->part === 'action' && $svo[$svo_i]['infinitive'] === '' ) { 
+					$svo[$svo_i]['infinitive'] = $svo[$svo_i]['adverb'];
+					$svo[$svo_i]['adverb'] = $svo[$svo_i]['action'];
+					$svo[$svo_i]['action'] = $text_data[$f_i][0]->id; 
+				}
 				// object adjective if adjective and action is set
 				if ($text_data[$f_i][0]->part === 'adjective' && $svo[$svo_i]['action_adjective'] === '' ) { 
 					$svo[$svo_i]['object_adjective'] = $text_data[$f_i][0]->id; 
@@ -387,7 +396,7 @@ class InterfaceController extends Controller {
 				{
 					// Find amount equate is referring to
 					if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
-					else { $computer_response .= '=is'; }
+					else { $computer_response .= '=is '; }
 				}
 				$computer_response .= get_word($relevant[0]->truth) ? '' : '--not ';
 				$computer_response .= get_word($relevant[0]->possesses) ? '#has ' : '';
@@ -470,6 +479,8 @@ class InterfaceController extends Controller {
 		$computer_response = str_replace(';1433', ':user_', $computer_response);
 		// Self
 		$computer_response = str_replace(':steve', ':me', $computer_response);
+
+		$computer_response = $computer_response === '' ? '...' : $computer_response;
 
 /*
 		// 
