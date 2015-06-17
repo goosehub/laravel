@@ -81,6 +81,7 @@ class InterfaceController extends Controller {
 		$text_input = str_replace('\'s ', '=is ', $text_input);
 		$text_input = str_replace('\'ll ', '#will ', $text_input);
 		$text_input = str_replace('\'ve ', '\possesses ', $text_input);
+		$text_input = str_replace('\'re ', '=are ', $text_input);
 
 		// 
 		// Translate pronouns
@@ -94,6 +95,8 @@ class InterfaceController extends Controller {
 		$text_input = str_replace(':My', ';' . $start, $text_input);
 		$text_input = str_replace(':you', ';Steve', $text_input);
 		$text_input = str_replace(':You', ';Steve', $text_input);
+		$text_input = str_replace(':your', ';Steve', $text_input);
+		$text_input = str_replace(':Your', ';Steve', $text_input);
 		$text_input = str_replace(':steve', ';Steve', $text_input);
 
 		// 
