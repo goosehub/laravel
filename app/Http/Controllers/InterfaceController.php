@@ -62,6 +62,7 @@ class InterfaceController extends Controller {
 		$text_input = str_replace('#has ', '\possesses ', $text_input);
 		$text_input = str_replace('#had ', '\possesses ', $text_input);
 		$text_input = str_replace('#have ', '\possesses ', $text_input);
+		$text_input = str_replace('#having ', '\possesses ', $text_input);
 		$text_input = str_replace('#own ', '\possesses ', $text_input);
 		$text_input = str_replace('#owned ', '\possesses ', $text_input);
 		$text_input = str_replace('#posesses ', '\possesses ', $text_input);
@@ -109,10 +110,10 @@ class InterfaceController extends Controller {
 		preg_match_all('/#[\S]+/', $text_input, $action);
 		preg_match_all('/=[\S]+/', $text_input, $equate);
 		preg_match_all('/\*[\S]+/', $text_input, $adjective);
-		preg_match_all('/\+[\S]+/', $text_input, $cheer);
-		preg_match_all('/-[\S]+/', $text_input, $jeer);
 		preg_match_all('/\+\+[\S]+/', $text_input, $positive);
 		preg_match_all('/--[\S]+/', $text_input, $negative);
+		preg_match_all('/\+[a-zA-Z][\S]+/', $text_input, $cheer);
+		preg_match_all('/-[a-zA-Z][\S]+/', $text_input, $jeer);
 		preg_match_all('/@[\S]+/', $text_input, $preposition);
 		preg_match_all('/\?[\S]+/', $text_input, $inquiry);
 		preg_match_all('/\\\[\S]+/', $text_input, $possesses);
@@ -206,9 +207,9 @@ class InterfaceController extends Controller {
 			// Set iteration defaults
 			$svo[$svo_i]['exclamation'] = false;
 			$svo[$svo_i]['preceding'] = $svo[$svo_i]['subject_amount'] = $svo[$svo_i]['object_amount'] = 'unknown';
-			$svo[$svo_i]['negative'] = $svo[$svo_i]['positive'] = $svo[$svo_i]['cheer'] = $svo[$svo_i]['jeer'] = $svo[$svo_i]['possesses'] = 
-				$svo[$svo_i]['subject'] = $svo[$svo_i]['object'] = $svo[$svo_i]['action'] = $svo[$svo_i]['action_adjective'] = $svo[$svo_i]['infinitive'] = 
+			$svo[$svo_i]['possesses'] = $svo[$svo_i]['subject'] = $svo[$svo_i]['object'] = $svo[$svo_i]['action'] = $svo[$svo_i]['action_adjective'] = $svo[$svo_i]['infinitive'] =
 				$svo[$svo_i]['adverb'] = $svo[$svo_i]['subject_adjective'] = $svo[$svo_i]['object_adjective'] = $svo[$svo_i]['preposition'] = '';
+			$svo[$svo_i]['negative'] = $svo[$svo_i]['positive'] = $svo[$svo_i]['cheer'] = $svo[$svo_i]['jeer'] = [];
 			$svo[$svo_i]['equate'] = false;
 			$svo[$svo_i]['truth'] = true;
 			$svo[$svo_i]['sentiment'] = 0;
@@ -270,7 +271,7 @@ class InterfaceController extends Controller {
 					// echo 'Relationship established. Start again<br>';
 
 					// Find if relationship is truth
-					$svo[$svo_i]['truth'] = count($svo[$svo_i]['negative']) >= 1 ? false : TRUE;
+					$svo[$svo_i]['truth'] = $svo[$svo_i]['negative'] === true ? false : TRUE;
 					// Find sentiment of relationship
 					$svo[$svo_i]['sentiment'] = count($svo[$svo_i]['cheer']) - count($svo[$svo_i]['cheer']);
 
@@ -326,7 +327,7 @@ class InterfaceController extends Controller {
 		// Declarative response
 		// 
 
-		if ($type_of_sentence === 'declarative')
+		if ($type_of_sentence === 'declarative' || $type_of_sentence === 'imperative')
 		{
 			// Construct in string
 			$in_query_string = '';
@@ -350,79 +351,82 @@ class InterfaceController extends Controller {
 										OR object IN (' . $in_query_string . ') 
 									)
 									ORDER BY RAND()');
-			// Get preceding
-			$preceding_id = $relevant[0]->id;
-			$following = [];
-			while ($preceding_id != 0)
+			if (! empty($relevant))
 			{
-				$following[] = DB::select('SELECT * 
-										FROM relationships 
-										WHERE preceding = :preceding', 
-										['preceding' => $preceding_id]);
-				$preceding_id = isset($following[0]->id) ? $following[0]->id : 0;
-			}
-
-			// Debug
-			// var_dump($relevant[0]);
-			// var_dump($following);
-
-			function get_word($word)
-			{
-				if ($word === '1') { return true; }
-				else if ($word === '0') { return false; }
-				$result = DB::select('SELECT * 
-										FROM words 
-										WHERE id = :id', 
-										['id' => $word]);
-				if (empty($word) ) { return false; }
-				return $result[0]->word;
-			}
-
-			$computer_response .= get_word($relevant[0]->subject) . ' ';
-			$computer_response .= get_word($relevant[0]->subject_amount) ? '/s ' : '';
-			if (get_word($relevant[0]->equate))
-			{
-				// Find amount equate is referring to
-				if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
-				else { $computer_response .= '=is'; }
-			}
-			$computer_response .= get_word($relevant[0]->truth) ? '' : '--not ';
-			$computer_response .= get_word($relevant[0]->possesses) ? '#has ' : '';
-			$computer_response .= get_word($relevant[0]->action_adjective) . ' ';
-			$computer_response .= get_word($relevant[0]->adverb) . ' ';
-			$computer_response .= get_word($relevant[0]->infinitive) . ' ';
-			$computer_response .= get_word($relevant[0]->action) . ' ';
-			$computer_response .= get_word($relevant[0]->object_adjective) . ' ';
-			$computer_response .= get_word($relevant[0]->preposition) . ' ';
-			$computer_response .= get_word($relevant[0]->object) . ' ';
-			$computer_response .= get_word($relevant[0]->object_amount) ? '/s' : ' ';
-
-			if (! empty($following[0]) )
-			{		
-				foreach ($following as $follow)
+				// Get preceding
+				$preceding_id = $relevant[0]->id;
+				$following = [];
+				while ($preceding_id != 0)
 				{
-					// $computer_response .= get_word($follow->subject) . ' ';
-					$computer_response .= get_word($follow[0]->subject_amount) ? '/s ' : '';
-					if (get_word($follow[0]->equate))
-					{
-						// Find amount equate is referring to
-						if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
-						else { $computer_response .= '=is'; }
-					}
-					$computer_response .= get_word($follow[0]->truth) ? '' : '--not ';
-					$computer_response .= get_word($follow[0]->possesses) ? '\\s ' : '';
-					$computer_response .= get_word($follow[0]->action_adjective) . ' ';
-					$computer_response .= get_word($follow[0]->adverb) . ' ';
-					$computer_response .= get_word($follow[0]->infinitive) . ' ';
-					$computer_response .= get_word($follow[0]->action) . ' ';
-					$computer_response .= get_word($follow[0]->object_adjective) . ' ';
-					$computer_response .= get_word($follow[0]->preposition) . ' ';
-					$computer_response .= get_word($follow[0]->object) . ' ';
-					$computer_response .= get_word($follow[0]->object_amount) ? '/s' : ' ';
-				}	
-			}
+					$following[] = DB::select('SELECT * 
+											FROM relationships 
+											WHERE preceding = :preceding', 
+											['preceding' => $preceding_id]);
+					$preceding_id = isset($following[0]->id) ? $following[0]->id : 0;
+				}
 
-			// $computer_response = 'Whatever';
+				// Debug
+				// var_dump($relevant[0]);
+				// var_dump($following);
+
+				function get_word($word)
+				{
+					if ($word === '1') { return true; }
+					else if ($word === '0') { return false; }
+					$result = DB::select('SELECT * 
+											FROM words 
+											WHERE id = :id', 
+											['id' => $word]);
+					if (empty($word) ) { return false; }
+					return $result[0]->word;
+				}
+
+				$computer_response .= get_word($relevant[0]->subject) . ' ';
+				$computer_response .= get_word($relevant[0]->subject_amount) ? '/s ' : '';
+				if (get_word($relevant[0]->equate))
+				{
+					// Find amount equate is referring to
+					if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
+					else { $computer_response .= '=is'; }
+				}
+				$computer_response .= get_word($relevant[0]->truth) ? '' : '--not ';
+				$computer_response .= get_word($relevant[0]->possesses) ? '#has ' : '';
+				$computer_response .= get_word($relevant[0]->action_adjective) . ' ';
+				$computer_response .= get_word($relevant[0]->adverb) . ' ';
+				$computer_response .= get_word($relevant[0]->infinitive) . ' ';
+				$computer_response .= get_word($relevant[0]->action) . ' ';
+				$computer_response .= get_word($relevant[0]->object_adjective) . ' ';
+				$computer_response .= get_word($relevant[0]->preposition) . ' ';
+				$computer_response .= get_word($relevant[0]->object) . ' ';
+				$computer_response .= get_word($relevant[0]->object_amount) ? '/s' : ' ';
+
+				if (! empty($following[0]) )
+				{		
+					foreach ($following as $follow)
+					{
+						// $computer_response .= get_word($follow->subject) . ' ';
+						$computer_response .= get_word($follow[0]->subject_amount) ? '/s ' : '';
+						if (get_word($follow[0]->equate))
+						{
+							// Find amount equate is referring to
+							if (substr($computer_response, -3) === '/s ') { $computer_response .= '=are '; }
+							else { $computer_response .= '=is'; }
+						}
+						$computer_response .= get_word($follow[0]->truth) ? '' : '--not ';
+						$computer_response .= get_word($follow[0]->possesses) ? '\\s ' : '';
+						$computer_response .= get_word($follow[0]->action_adjective) . ' ';
+						$computer_response .= get_word($follow[0]->adverb) . ' ';
+						$computer_response .= get_word($follow[0]->infinitive) . ' ';
+						$computer_response .= get_word($follow[0]->action) . ' ';
+						$computer_response .= get_word($follow[0]->object_adjective) . ' ';
+						$computer_response .= get_word($follow[0]->preposition) . ' ';
+						$computer_response .= get_word($follow[0]->object) . ' ';
+						$computer_response .= get_word($follow[0]->object_amount) ? '/s' : ' ';
+					}	
+				}
+
+				// $computer_response = 'Whatever';
+			}
 		}
 
 		// 
@@ -447,10 +451,10 @@ class InterfaceController extends Controller {
 		// Imperative response
 		// 
 
-		else if ($type_of_sentence === 'imperative')
-		{
-			$computer_response = ':I #can --not';
-		}
+		// else if ($type_of_sentence === 'imperative')
+		// {
+		// 	$computer_response = ':I #can --not';
+		// }
 
 
 		// Create pronouns
