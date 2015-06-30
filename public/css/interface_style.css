@@ -1,5 +1,5 @@
 body {
-	
+	background: #FFF3B7;
 }
 #text_input {
 	color: #000;
@@ -31,12 +31,15 @@ body {
 	padding-top: 0;
 }
 .explain_bubble {
-	background: #44aaaa;
+	background: #7D95D2;
 	color: #000;
 	border-radius: 0.5em;
 	padding: 0.8em;
 	margin: 0.2em;
 	word-spacing: 0.4em;
+   -moz-box-shadow:    inset 0 0 10px #000000;
+   -webkit-box-shadow: inset 0 0 10px #000000;
+   box-shadow:         inset 0 0 10px #000000;
 }
 .part_symbol {
 	font-size: 1.6em;

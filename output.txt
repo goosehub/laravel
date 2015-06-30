@@ -1,0 +1,24 @@
+conversation
+
+how questions
+	talk to me about this at a low level
+why questions
+	talk to me about this at a high level
+what questions
+	talk to me about a thing or stuff
+who questions
+	talk to me about a person (thing noun)
+where questions
+	talk to me about a place (thing noun)
+when questions
+	talk to me about a time (event noun)
+which questions
+	tell me which is true
+did, does, will, is, has questions
+	tell me is this true
+answer
+	yes, no, maybe
+discuss
+	talk to them at a low level
+talk
+	talk to them at a high level

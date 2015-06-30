@@ -1,0 +1,47 @@
+=nouns
+	person
+	pronoun
+	common
+	stuff
+	event
+	concept
+		=William=Shakespear =Jacksonville =water =people =time
+;verb, adverb
+	!do !act !said
+	^make ^cause ^create
+	>go >move >to
+	=is =have =be =of =like
+*adjective
+	*good *bad *beautiful *fourtytwo *7
+@time proposition
+	@at @on
+#space proposition
+	#at #on
+$relationship proposition
+	$of $with $like
+interjections
+	+positive
+	-negative
+~inquiry
+	~how ~why ~what ~who ~where ~when ~does ~is ~has
+	how
+<past
+^present
+>future
+%interval
+	<was ^is >will %monday
+`articles
+	the
+	a/an
+&conjunctions ()
+	 $if () $then () $and () $else () $or () $but $not ()
+|pronouns
+	|I |you |this |that |there |them |those
+'contractions
+	isn't don't won't
+	/s
+-statement.
+-question?
+*important -statement!
+possess\s
+multiple/s

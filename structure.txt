@@ -1,0 +1,84 @@
+===========
+database
+===========
+
+		id
+		created
+		word
+		weight
+
+nouns
+	person
+	proper
+	common
+	stuff
+	event
+	state
+	concept
+
+verbs/adverbs
+	do
+	make
+	go
+	is
+
+adjectives
+
+time preposition
+
+space preposition
+
+relationship preposition
+
+inquiry
+
+interjections
+	positive
+	negative
+
+universal relation lookup
+	part key a
+	table key a
+	part key b
+	table key b
+	true
+	false
+
+meta relation lookup
+	relation key a
+	relation key b
+	true
+	false
+
+		-jack ;kissed -jane\s -lip/s
+		jack to kissed
+		jack kissed
+
+		jane\s -> jane has
+		jane to has
+		has to lips
+		jane has to has lips
+		jane has lips
+
+		jack kissed to janes lips
+		jack kissed janes lips
+		jack kissed jane
+		jack kissed lips
+
+timeline
+	word key
+	table key
+	reference
+	before
+	during
+	after
+	-every
+conjunctions
+	if/when
+	else/then 
+	and 
+	or 
+	but 
+	not
+pronouns
+contractions

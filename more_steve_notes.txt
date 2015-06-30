@@ -1,0 +1,42 @@
+-nouns
+	person
+	pronoun
+	common
+	stuff
+	event
+	concept
+		-William_Shakespear -Jacksonville water -people -time
+_connector
+	-William_Shakespear
+;verb, adverb
+	!do !act !said
+	^make ^cause ^create
+	>go >move >to
+	=is =have =be =of =like
+*adjective
+	good bad beautiful thritythree 7
+@time proposition
+	@at @on
+#space proposition
+	#at #on
+$relationship proposition
+	$of $with $like
+!interjections
+	+positive
+	-negative
+?inquiry
+	?how ?why ?what ?who ?where ?when ?does
+
+< past
+^ present
+> future
+`articles
+	the
+	a
+	an
+&conjunctions ()
+	 $if () $then () $and () $else () $or () $but ()
+|pronouns
+	|I |you |this |that |there |them |those
+'contractions
+	isn't don't couldn't

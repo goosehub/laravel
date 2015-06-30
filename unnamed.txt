@@ -1,0 +1,99 @@
+???
+
+profile
+opinions (only keep most recent)
+referrals (can recommend two people you know together)
+messages (used to record conversations with people)
+users
+password_resets
+migrations
+
+opinions
+	id
+	by_user_key
+	to_user_key
+	text
+	created_at
+	updated_at
+
+referrals
+	id
+	by_user_key
+	to_user_key
+	for_user_key
+	accepted
+	created_at
+	updated_at
+
+messages
+	id
+	by_user_key
+	to_user_key
+	message_text
+	status
+	created_at
+
+backgrounds
+	id
+	by_user_key
+	to_user_key
+	room_key
+	background_file
+	created_at
+	updated_at
+
+youtubes
+	id
+	by_user_key
+	to_user_key
+	room_key
+	youtube_slug
+	status
+	start
+	end
+	duration
+	created_at
+
+rooms
+	id
+	room_slug
+	room_html
+	created_at
+	updated_at
+	room_background_file
+
+chat
+	id
+	by_user_key
+	room_key
+	chat_text
+	created_at
+
+users
+	id
+	name
+	email
+	password
+	remember_token
+	avatar_file
+	location
+	coord (cood with google maps)
+	last_online
+	created_at
+	updated_at
+
+flags
+	id
+	by_user_key
+	to_user_key
+	for_item_key
+	created_at
+
+password_resets
+	email
+	token
+	created_at
+
+migrations
+	migration
+	batch
